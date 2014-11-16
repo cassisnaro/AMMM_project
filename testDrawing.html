@@ -1,0 +1,59 @@
+<html>
+	<body>
+	<script>
+			function plotAreas(elementId, x0, y0, width0, height0, x1, y1, width1, height1) {
+				var c_canvas = document.getElementById(elementId);
+				var context = c_canvas.getContext("2d");
+			
+				var cell_width=10;
+				var cell_height=10;
+			
+				function transformCoordinates(x, y) {
+					var output={};
+					output.y = c_canvas.height-y*cell_height;
+					output.x = x*cell_width;
+					return output;
+				}
+			
+				function myRectangle(context, x, y, width, height) {
+					var bottom_left_rectangle = transformCoordinates(x,y);
+					var top_left_rectangle = bottom_left_rectangle;
+					top_left_rectangle.y -= height*cell_height;
+				
+					context.fillRect(top_left_rectangle.x, top_left_rectangle.y, width*cell_width, height*cell_height);
+				}
+
+				for (var x = 0.5; x < c_canvas.width; x += cell_width) {
+					context.moveTo(x, 0);
+					context.lineTo(x, c_canvas.height);
+				}
+
+				for (var y = 0.5; y < c_canvas.height; y += cell_height) {
+					context.moveTo(0, y);
+					context.lineTo(c_canvas.width, y);
+				}
+
+				context.moveTo(0,0);
+				context.strokeStyle = "#ddd";
+				context.stroke();
+			
+				context.fillStyle="#FF0000";
+				myRectangle(context, x0, y0, width0, height0);
+				context.fillStyle="#00FF00";
+				myRectangle(context, x1, y1, width1, height1);
+			}
+		</script>
+		<canvas id="c" width="501px" height="381px" style="display:block;  margin-bottom: 50px;"></canvas>
+		<script>
+			plotAreas("c",2,2,3,4,5,1,2,7);
+		</script>
+		<canvas id="c1" width="501px" height="381px" style="display:block;  margin-bottom: 50px;"></canvas>
+		<script>
+			plotAreas("c1",2,2,3,4,5,1,2,7);
+		</script>
+		<canvas id="c2" width="501px" height="381px" style="display:block;  margin-bottom: 50px;"></canvas>
+		<script>
+			plotAreas("c2",2,2,3,4,5,1,2,7);
+		</script>
+	</body>
+</html>
