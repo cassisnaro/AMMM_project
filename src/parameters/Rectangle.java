@@ -7,11 +7,12 @@ import java.util.Set;
 /**
  * Created by daniel on 15/11/14.
  */
-public class Rectangle {
+public class Rectangle implements Comparable<Rectangle>{
+    static int idCount=0;
+    int id;
     Set<Integer> frequencySlices;
     int t_start;
     int t_end;
-
     public Rectangle(int t_start, int t_end, int low_slice, int max_slice) {
         this.t_start = t_start;
         this.t_end = t_end;
@@ -19,6 +20,12 @@ public class Rectangle {
         for (int slice=low_slice; slice<= max_slice; slice++){
             frequencySlices.add(slice);
         }
+        id=idCount;
+        idCount++;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public Set<Integer> getFrequencySlices() {
@@ -56,6 +63,10 @@ public class Rectangle {
         return Collections.max(frequencySlices);
     }
 
+    public boolean frequencyBelongsToRectangle(int freq){
+        return (getMinFreq()<= freq) && (freq<=getMaxFreq());
+    }
+
     @Override
     public boolean equals(Object arg0) {
         if (arg0 instanceof Rectangle) {
@@ -79,6 +90,11 @@ public class Rectangle {
             hash = hash << 6 ^ getMaxFreq();
             return hash;
         }
+    }
+
+    @Override
+    public int compareTo(Rectangle rectangle) {
+        return ((Integer)this.id).compareTo(rectangle.id);
     }
 
 }

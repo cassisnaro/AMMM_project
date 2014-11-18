@@ -17,12 +17,19 @@ public class Transfer {
     Set<Rectangle> A0;
     Set<Rectangle> A1;
     Set<RectanglePair> feasiblePairs;
-
     public Transfer(int node_origin, int node_destination, int time_completion, int data_amount) {
         this.node_origin = node_origin;
         this.node_destination = node_destination;
         this.time_completion = time_completion;
         this.data_amount = data_amount;
+    }
+
+    public Set<Rectangle> getA0() {
+        return A0;
+    }
+
+    public Set<Rectangle> getA1() {
+        return A1;
     }
 
     public Set<RectanglePair> getFeasiblePairs() {
