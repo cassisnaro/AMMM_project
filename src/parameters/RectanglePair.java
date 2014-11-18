@@ -1,7 +1,5 @@
 package parameters;
 
-import org.w3c.dom.css.Rect;
-
 /**
  * Created by daniel on 15/11/14.
  */
@@ -11,6 +9,13 @@ public class RectanglePair {
     int id;
     Rectangle a0;
     Rectangle a1;
+
+    public RectanglePair(Rectangle a0, Rectangle a1) {
+        this.a0 = a0;
+        this.a1 = a1;
+        id = idCount;
+        idCount++;
+    }
 
     public Rectangle getA0() {
         return a0;
@@ -22,15 +27,6 @@ public class RectanglePair {
 
     public Rectangle getA1() {
         return a1;
-    }
-
-
-
-    public RectanglePair(Rectangle a0, Rectangle a1) {
-        this.a0 = a0;
-        this.a1 = a1;
-        id = idCount;
-        idCount++;
     }
 
     @Override

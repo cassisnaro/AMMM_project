@@ -1,6 +1,5 @@
 package parameters;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +9,8 @@ import java.util.Set;
  */
 public class Rectangle {
     Set<Integer> frequencySlices;
+    int t_start;
+    int t_end;
 
     public Rectangle(int t_start, int t_end, int low_slice, int max_slice) {
         this.t_start = t_start;
@@ -43,10 +44,6 @@ public class Rectangle {
     public void setT_end(int t_end) {
         this.t_end = t_end;
     }
-
-    int t_start;
-    int t_end;
-
 
     public int getArea(){
         return frequencySlices.size()*(t_end-t_start);

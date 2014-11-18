@@ -1,6 +1,5 @@
 package sample;
 
-import Viewer.RectanglePairViewer;
 import Viewer.TestAreasViewer;
 import javafx.application.Application;
 import javafx.geometry.HPos;
@@ -14,23 +13,21 @@ import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import parameters.Rectangle;
-import parameters.RectanglePair;
-import sun.security.tools.keytool.Main;
 
 
 public class WebViewSample extends Application {
     private Scene scene;
+
+    public static void main(String[] args){
+        launch(args);
+    }
+
     @Override public void start(Stage stage) {
         // create the scene
         stage.setTitle("Web View");
         scene = new Scene(new Browser(),750,500, Color.web("#666970"));
         stage.setScene(scene);
         stage.show();
-    }
-
-    public static void main(String[] args){
-        launch(args);
     }
 }
 class Browser extends Region {

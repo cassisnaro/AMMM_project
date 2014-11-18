@@ -1,11 +1,8 @@
 package Testing;
 
-import parameters.Rectangle;
 import parameters.RectanglePair;
 import parameters.Transfer;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
