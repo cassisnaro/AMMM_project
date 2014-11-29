@@ -1,4 +1,4 @@
 L
-(a,b) (a,c) (a,d) (a,e) (b,c) (b,d) (b,e) (c,d) (c,e) (d,e)
+(a,b,1) (a,c,1) (a,d,1) (a,e,1) (b,c,1) (b,d,1) (b,e,1) (c,d,1) (c,e,1) (d,e,1)
 LT
 (a,c) (d,e)

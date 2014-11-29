@@ -6,10 +6,11 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import com.upc.ammm.dctransfers.models.Graph;
+import com.upc.ammm.dctransfers.models.NodePair;
 import com.upc.ammm.dctransfers.models.Pair;
+import com.upc.ammm.dctransfers.models.Path;
 
 public class WriteWithPrintWriter {
 	
@@ -22,7 +23,7 @@ public class WriteWithPrintWriter {
 		this.graph = g;
 		this.transmissions = t;
 		
-		fFilePath = "/Users/gaby/Documents/MIRI/workspace/PrecomputeNetworkPaths/output.txt";
+		fFilePath = "/Users/gaby/Documents/MIRI/Algorithmic Methods for Mathematical Models/project/implementation/AMMM_project/PathPrecomputation/output.txt";
 		processWriteLineByLine();
 	}
 	
@@ -33,21 +34,21 @@ public class WriteWithPrintWriter {
 			for (Pair t : transmissions) {
 				precomputer.precumputePathsFromTransmission(t.getSource(), t.getDestination());
 				
-				ArrayList<LinkedList<String>> paths = precomputer.getPaths();
+				ArrayList<Path> paths = precomputer.getPaths();
 				
 				writer.write(paths.size() + " ");
 				writer.write("(" + t.getSource() + "," + t.getDestination() + ")\n");
 				
 				String pathLine;
 				
-				for (LinkedList<String> path : paths) {
+				for (Path path : paths) {
 					pathLine = "";
 					
-					for (String node : path) {
-						pathLine += node + " ";
+					for (NodePair node : path.getPath()) {
+						pathLine += node.getName() + " ";
 					}
 					
-					writer.write(pathLine + "\n");
+					writer.write(path.getCost() + " " + pathLine + "\n");
 				}
 			} 
 			

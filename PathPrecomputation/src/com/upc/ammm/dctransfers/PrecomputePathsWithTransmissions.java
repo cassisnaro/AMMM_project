@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.upc.ammm.dctransfers.models.Graph;
+import com.upc.ammm.dctransfers.models.NodePair;
+import com.upc.ammm.dctransfers.models.Path;
 
 public class PrecomputePathsWithTransmissions {
 	
 	private Graph graph;	
 	private String source;
 	private String destination;
-	private ArrayList<LinkedList<String>> paths;
+	private ArrayList<Path> paths;
 	
 	public PrecomputePathsWithTransmissions(Graph g) {
 		this.graph = g;		
@@ -20,32 +22,32 @@ public class PrecomputePathsWithTransmissions {
 		this.source = s;
 		this.destination = d;
 		
-		LinkedList<String> visited = new LinkedList<String>();
-        visited.add(source);
-        this.paths = bfs(visited, new ArrayList<LinkedList<String>>());
+		LinkedList<NodePair> visited = new LinkedList<NodePair>();
+        visited.add(new NodePair(source, 0));
+        this.paths = bfs(visited, new ArrayList<Path>());
 	}
 	
-	private ArrayList<LinkedList<String>> bfs(LinkedList<String> visited, ArrayList<LinkedList<String>> paths) {
-		LinkedList<String> nodes = graph.adjacentNodes(visited.getLast());
+	private ArrayList<Path> bfs(LinkedList<NodePair> visited, ArrayList<Path> paths) {
+		LinkedList<NodePair> nodes = graph.adjacentNodes(visited.getLast().getName());
 		
         // examine adjacent nodes
-        for (String node : nodes) {
-            if (visited.contains(node)) {
+        for (NodePair node : nodes) {
+            if (containsNode(visited, node)) {
                 continue;
             }
             
-            if (node.equals(destination)) {
+            if (node.getName().equals(destination)) {
                 visited.add(node);
                 //printPath(visited);
-                paths.add(new LinkedList<String>(visited));
+                paths.add(new Path(new LinkedList<NodePair>(visited), computePathCost(visited)));
                 visited.removeLast();
                 break;
             }
         }
         
         // in breadth-first, recursion needs to come after visiting adjacent nodes
-        for (String node : nodes) {
-            if (visited.contains(node) || node.equals(destination)) {
+        for (NodePair node : nodes) {
+            if (containsNode(visited, node) || node.getName().equals(destination)) {
                 continue;
             }
             
@@ -57,7 +59,31 @@ public class PrecomputePathsWithTransmissions {
         return paths;
     }
 	
-	public ArrayList<LinkedList<String>> getPaths() {
+	public ArrayList<Path> getPaths() {
 		return paths;
+	}
+	
+	public int computePathCost(LinkedList<NodePair> path) {
+		int cost = 0;
+		
+		for (NodePair node : path) {
+			cost += node.getCost();
+		}
+		
+		return cost;
+	}
+	
+	public boolean containsNode(LinkedList<NodePair> visited, NodePair node) {
+		boolean contained = false;
+		
+		for (NodePair n : visited) {
+			if (n.getName().equals(node.getName())) {
+				contained = true;
+				
+				break;
+			}
+		}
+		
+		return contained;
 	}
 }

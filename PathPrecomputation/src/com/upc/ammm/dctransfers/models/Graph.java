@@ -7,26 +7,26 @@ import java.util.Map;
 import java.util.Set;
 
 public class Graph {
-	private Map<String, LinkedHashSet<String>> map = new HashMap<String, LinkedHashSet<String>>();
+	private Map<String, LinkedHashSet<NodePair>> map = new HashMap<String, LinkedHashSet<NodePair>>();
 
-    public void addEdge(String node1, String node2) {
-        LinkedHashSet<String> adjacent = map.get(node1);
+    public void addEdge(String node1, String node2, int node2Cost) {
+        LinkedHashSet<NodePair> adjacent = map.get(node1);
         
         if (adjacent == null) {
-            adjacent = new LinkedHashSet<String>();
+            adjacent = new LinkedHashSet<NodePair>();
             map.put(node1, adjacent);
         }
         
-        adjacent.add(node2);
+        adjacent.add(new NodePair(node2, node2Cost));
     }
 
-    public void addTwoWayVertex(String node1, String node2) {
-        addEdge(node1, node2);
-        addEdge(node2, node1);
+    public void addTwoWayVertex(String node1, int node1Cost, String node2, int node2Cost) {
+        addEdge(node1, node2, node2Cost);
+        addEdge(node2, node1, node1Cost);
     }
 
-    public boolean isConnected(String node1, String node2) {
-    	Set<String> adjacent = map.get(node1);
+    public boolean isConnected(String node1, NodePair node2) {
+    	Set<NodePair> adjacent = map.get(node1);
     	
         if (adjacent == null) {
             return false;
@@ -35,13 +35,13 @@ public class Graph {
         return adjacent.contains(node2);
     }
 
-    public LinkedList<String> adjacentNodes(String last) {
-        LinkedHashSet<String> adjacent = map.get(last);
+    public LinkedList<NodePair> adjacentNodes(String last) {
+        LinkedHashSet<NodePair> adjacent = map.get(last);
         
         if (adjacent == null) {
-            return new LinkedList<String>();
+            return new LinkedList<NodePair>();
         }
         
-        return new LinkedList<String>(adjacent);
+        return new LinkedList<NodePair>(adjacent);
     }
 }

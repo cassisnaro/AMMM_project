@@ -2,7 +2,6 @@ package com.upc.ammm.dctransfers;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +19,7 @@ public class ReadWithScanner {
 	private ArrayList<Pair> transmissions = new ArrayList<Pair>();	
 
 	public ReadWithScanner() throws URISyntaxException, IOException {
-		fFilePath = new File("/Users/gaby/Documents/MIRI/workspace/PrecomputeNetworkPaths/input.txt");
+		fFilePath = new File("/Users/gaby/Documents/MIRI/Algorithmic Methods for Mathematical Models/project/implementation/AMMM_project/PathPrecomputation/input.txt");
 		processReadLineByLine();
 	}
 	
@@ -56,12 +55,14 @@ public class ReadWithScanner {
 			String[] links = line.split(" ");
 			String n1;
 			String n2;
+			int cost;
 
 			for (String l : links) {
 				n1 = l.substring(1, 2);
 				n2 = l.substring(3, 4);
+				cost = Integer.parseInt(l.substring(5, 6));
 				
-				graph.addTwoWayVertex(n1, n2);
+				graph.addTwoWayVertex(n1, cost, n2, cost);
 			}
 		}
 		else if (lineIdentifier.equals("LT")) {
