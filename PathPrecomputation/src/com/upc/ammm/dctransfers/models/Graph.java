@@ -8,6 +8,8 @@ import java.util.Set;
 
 public class Graph {
 	private Map<String, LinkedHashSet<NodePair>> map = new HashMap<String, LinkedHashSet<NodePair>>();
+    private Map<Link, Integer> linksIdentifier = new HashMap<>();
+    private int identifierCount = 0;
 
     public void addEdge(String node1, String node2, int node2Cost) {
         LinkedHashSet<NodePair> adjacent = map.get(node1);
@@ -18,11 +20,15 @@ public class Graph {
         }
         
         adjacent.add(new NodePair(node2, node2Cost));
+
     }
 
     public void addTwoWayVertex(String node1, int node1Cost, String node2, int node2Cost) {
         addEdge(node1, node2, node2Cost);
         addEdge(node2, node1, node1Cost);
+
+        linksIdentifier.put(new Link(node1,node2), new Integer(identifierCount));
+        identifierCount++;
     }
 
     public boolean isConnected(String node1, NodePair node2) {
