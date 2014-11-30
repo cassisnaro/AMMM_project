@@ -1,8 +1,10 @@
 package com.upc.ammm.dctransfers;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -19,7 +21,8 @@ public class ReadWithScanner {
 	private ArrayList<Pair> transmissions = new ArrayList<Pair>();	
 
 	public ReadWithScanner() throws URISyntaxException, IOException {
-		fFilePath = new File("/Users/gaby/Documents/MIRI/Algorithmic Methods for Mathematical Models/project/implementation/AMMM_project/PathPrecomputation/input.txt");
+        File fileParent= new File(System.getProperty("user.dir"));
+		fFilePath = new File(fileParent,"input.txt");
 		processReadLineByLine();
 	}
 	

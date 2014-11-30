@@ -1,5 +1,6 @@
 package com.upc.ammm.dctransfers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
@@ -22,8 +23,9 @@ public class WriteWithPrintWriter {
 	public WriteWithPrintWriter(Graph g, ArrayList<Pair> t) throws URISyntaxException, IOException {
 		this.graph = g;
 		this.transmissions = t;
-		
-		fFilePath = "/Users/gaby/Documents/MIRI/Algorithmic Methods for Mathematical Models/project/implementation/AMMM_project/PathPrecomputation/output.txt";
+
+        File fileParent= new File(System.getProperty("user.dir"));
+        fFilePath = new File(fileParent,"output.txt").getPath();
 		processWriteLineByLine();
 	}
 	
