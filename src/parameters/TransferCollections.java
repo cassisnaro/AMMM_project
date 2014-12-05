@@ -4,7 +4,6 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -24,41 +23,48 @@ public class TransferCollections {
     }
     public void formatData(FileOutputStream file){
         TreeSet<Rectangle> A0s, A1s;
-        A0s=new TreeSet<Rectangle>();
-        A1s=new TreeSet<Rectangle>();
-        for(Transfer transfer: transfers){
-            A0s.addAll(transfer.getA0());
-            A1s.addAll(transfer.getA0());
-        }
         PrintStream printStream = new PrintStream(file);
-        printStream.print("[");
-        for(int freq=0; freq<maxFreq; freq++){
-            printStream.print("[");
-            for(Rectangle rectangle:A0s){
-                if (rectangle.frequencyBelongsToRectangle(freq)){
-                    printStream.print("1, ");
-                } else {
-                    printStream.print("0, ");
-                }
-            }
-            printStream.print("]\n");
-        }
-        printStream.print("]\n");
-        printStream.print("[");
-        for(int freq=0; freq<maxFreq; freq++){
-            printStream.print("[");
-            for(Rectangle rectangle:A1s){
-                if (rectangle.frequencyBelongsToRectangle(freq)){
-                    printStream.print("1, ");
-                } else {
-                    printStream.print("0, ");
-                }
-            }
-            printStream.print("]\n");
-        }
-        printStream.print("]\n");
 
-        boolean[][] compatibilities = new boolean[A0s.size()][A1s.size()];
+        for(Transfer transfer: transfers){
+            printStream.print("mA0=[");
+            for(Rectangle rectangle:transfer.getA0()){
+                printStream.print("[");
+                for(int freq=0; freq<maxFreq; freq++){
+                    if (freq==0){
+                        printStream.print(", ");
+                    }
+                    if (rectangle.frequencyBelongsToRectangle(freq)){
+                        printStream.print("1");
+                    } else {
+                        printStream.print("0");
+                    }
+                }
+                printStream.print("]\n");
+            }
+            printStream.print("]\n");
+        }
+
+
+        for(Transfer transfer: transfers){
+            printStream.print("mA1=[");
+            for(Rectangle rectangle:transfer.getA1()){
+                printStream.print("[");
+                for(int freq=0; freq<maxFreq; freq++){
+                    if (freq==0){
+                        printStream.print(", ");
+                    }
+                    if (rectangle.frequencyBelongsToRectangle(freq)){
+                        printStream.print("1");
+                    } else {
+                        printStream.print("0");
+                    }
+                }
+                printStream.print("]\n");
+            }
+            printStream.print("]\n");
+        }
+
+        /*boolean[][] compatibilities = new boolean[A0s.size()][A1s.size()];
         for(int i=0; i<A0s.size(); i++){
             for(int j=0; j<A1s.size(); j++){
                 compatibilities[i][j]=false;
