@@ -73,7 +73,7 @@ subject to{
 		forall(s in S){
 			forall(t in T){
 				sum(r in R) (sum(a in mA0[r]) delta_as[a,s] * gamma_at[a,t] * rho_re[r,e] * x_ar_0[a,r]) 
-				+ sum(r in R) (sum(a in A1[r]) delta_as[a,s] * gamma_at[a,t] * rho_re[r,e] * x_ar_1[a,r]) <= alpha_est[e,s,t];
+				+ sum(r in R) (sum(a in A1[r]) delta_as[a,s] * gamma_at[a,t] * rho_re[r,e] * x_ar_1[a,r]) <= 1;
 			}
 		}
 	}
