@@ -1,5 +1,6 @@
 package Writer;
 
+import parameters.RequestedTransfer;
 import parameters.Transfer;
 import parameters.TransferCollections;
 
@@ -12,8 +13,10 @@ import java.io.FileOutputStream;
  */
 public class Writer {
     public static void main(String[] args){
-        TransferCollections transferCollections = new TransferCollections(4);
+        TransferCollections transferCollections = new TransferCollections(3);
         transferCollections.add_transfer(new Transfer(0,1,4,3));
+        transferCollections.add_transfer(new Transfer(0,1,3,9));
+        transferCollections.setRequestedTransfer(new RequestedTransfer(0,2,2,3));
 
         File fileParent= new File(System.getProperty("user.dir"));
         try {
