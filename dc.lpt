@@ -1,0 +1,86 @@
+int nA=...;
+int nR=...;
+int nP=...;
+int nS=...;
+int nE=...;
+int nT=...;
+int nA0=...;
+int nA1=...;
+
+range A=1..nA;
+range R=1..nR;
+range P=1..nP;
+range S=1..nS;
+range E=1..nE;
+range T=1..nT;
+range A0=1..nA0;
+range A1=1..nA1;
+
+int mA[a in A, s in S]=...;
+int mA0[r in R, a0 in A0, s in S]=...;
+int mA1[r in R, a1 in A1, s in S]=...;
+
+int beta_ra0a1[r in R, a0 in A0, a1 in A1]=...;
+int omega_ar[r in R, a0 in A0]=...;
+//int delta_a0s[a0 in A0, s in S]=...;
+//int delta_a1s[a1 in A1, s in S]=...;
+int gamma_at[a in A, t in T]=...;
+int gamma_a0t[r in R, a0 in A0, t in T]=...;
+int gamma_a1t[r in R, a1 in A1, t in T]=...;
+int rho_pe[p in P, e in E]=...;
+int rho_re[r in R, e in E]=...;
+//int alpha_est[e in E, s in S, t in T]=...;
+
+dvar boolean x_ap[a in A, p in P];
+dvar boolean x_ar_0[r in R, a0 in A0];
+dvar boolean x_ar_1[r in R, a1 in A1];
+//dvar boolean x_a1r_1[r in R, a1 in mA1];
+dvar boolean y_r[r in R];
+dvar float+ z;
+
+
+// Objective
+minimize z;
+
+subject to{
+	// Constraint 1
+	sum(a in A) (sum(p in P) x_ap[a,p]) == 1; 
+ 	  
+	//Constraint 2
+	forall(r in R) {
+		sum(a in A0) x_ar_0[r,a] == 1;
+	}
+		  
+	//Constraint 3
+	forall(r in R) {
+		sum(a in A1) x_ar_1[r,a] == 1;
+	}
+	
+	//Constraint 4
+	forall(r in R){
+		forall(a0 in A0){
+			sum(a1 in A1) beta_ra0a1[r,a0,a1] * x_ar_1[r,a1] >= x_ar_0[r,a0];
+		}
+	}
+
+	//Constraint 5
+	forall(r in R){
+		forall(a in A0){
+			x_ar_0[r,a] - omega_ar[r,a] <= y_r[r];
+		}
+	}
+
+	//Constraint 6
+	forall(e in E){
+		forall(s in S){
+			forall(t in T){
+			  	sum(a in A) (sum(p in P) mA[a,s] * gamma_at[a,t] * rho_pe[p,e] * x_ap[a, p])
+			  	  + sum(r in R)(sum(a0 in A0)mA0[r,a0,s] * gamma_a0t[r,a0,t] * rho_re[r,e] * x_ar_0[r,a0])
+			  	  + sum(r in R) (sum(a1 in A1) mA1[r,a1,s] * gamma_a1t[r,a1,t] * rho_re[r,e] * x_ar_1[r,a1])<= 1; 
+			}
+		}
+	}
+
+	z == sum(r in R) y_r[r];
+
+}
