@@ -1,8 +1,10 @@
 package com.upc.ammm.dctransfers.models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +12,7 @@ public class Graph {
 	private Map<String, LinkedHashSet<NodePair>> map = new HashMap<String, LinkedHashSet<NodePair>>();
     private Map<Link, Integer> linksIdentifier = new HashMap<>();
     private int identifierCount = 0;
+    private ArrayList<Path> paths;
 
     public void addEdge(String node1, String node2, int node2Cost) {
         LinkedHashSet<NodePair> adjacent = map.get(node1);
@@ -50,4 +53,16 @@ public class Graph {
         
         return new LinkedList<NodePair>(adjacent);
     }
+
+	public Map<Link, Integer> getLinksIdentifier() {
+		return linksIdentifier;
+	}
+	
+	public Set<String> getNodes() {
+		return map.keySet();
+	}
+	
+	public ArrayList<Path> getPaths() {
+		return paths;
+	}
 }
