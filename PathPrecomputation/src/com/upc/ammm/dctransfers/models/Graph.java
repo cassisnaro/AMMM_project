@@ -62,6 +62,10 @@ public class Graph {
 		return map.keySet();
 	}
 	
+	public Set<Link> getLinks() {
+		return linksIdentifier.keySet();
+	}
+	
 	public ArrayList<Path> getPaths() {
 		return paths;
 	}

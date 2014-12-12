@@ -40,16 +40,44 @@ public class WriteWithPrintWriter {
 			List<Pair> foundPaths = new ArrayList<Pair>();			
 			Set<String> nodes = graph.getNodes();
 			Pair auxPair;
+			ArrayList<Path> paths;
+			ArrayList<Path> allPaths = new ArrayList<Path>();
+			String pathLine;
 			
 			for (String s : nodes) {
 				for (String d : nodes) {
 					if (!s.equals(d)) {
 						auxPair = new Pair(s, d);
+
+						System.out.println("FOUND PATHS: ");
 						
-						if (!foundPaths.contains(auxPair)) {
+						for (Pair pair : foundPaths) {
+							System.out.print("(" + pair.getSource() + ", " + pair.getDestination() + ") ");
+						}
+						
+						System.out.print("\n");
+						
+						if (!Pair.containsPair(foundPaths, auxPair)) {
+							System.out.println("COMPUTING PATHS BETWEEN (" + s + ", " + d + ")");
+							
 							precomputer.precumputePathsFromTransmission(s, d);
 							
-							ArrayList<Path> paths = precomputer.getPaths();
+							paths = precomputer.getPaths();
+							
+							System.out.println("------------ PATHS BETWEEN (" + s + ", " + d + ") OR (" + d + ", " + s + ") ------------");
+							System.out.println("------------ TOTAL: " + paths.size());
+							
+							for (Path p : paths) {
+								pathLine = "";
+								
+								for (NodePair node : p.getPath()) {
+									pathLine += node.getName() + " ";
+								}
+								
+								System.out.println(pathLine);								
+							}
+							
+							allPaths.addAll(precomputer.getPaths());
 							
 							foundPaths.add(new Pair(s, d));
 							foundPaths.add(new Pair(d, s));
@@ -57,6 +85,47 @@ public class WriteWithPrintWriter {
 					}
 				}
 			}
+			
+			System.out.println("TOTAL PATHS IN WHOLE GRAPH: " + allPaths.size());
+			
+			Set<Link> links = graph.getLinks();
+			int linksSize = links.size();
+			int allPathsSize = allPaths.size();
+			int auxCounter1;
+			int auxCounter2 = 1;
+			
+			writer.write("paths=[\n");
+			
+			for (Path p : allPaths) {
+				auxCounter1 = 1;
+				
+				writer.write("[");
+				
+				for (Link l : links) {
+					if (p.hasLink(l)) {
+						writer.write("1");
+					}
+					else {
+						writer.write("0");
+					}
+					
+					if (auxCounter1 < linksSize) {
+						writer.write(", ");
+					}
+					
+					auxCounter1++;
+				}
+				
+				writer.write("]");
+				
+				if (auxCounter2 < allPathsSize) {
+					writer.write(",\n");
+				}
+				
+				auxCounter2++;				
+			}
+			
+			writer.write("]\n");
 			
 //			for (Pair t : transmissions) {
 //				precomputer.precumputePathsFromTransmission(t.getSource(), t.getDestination());

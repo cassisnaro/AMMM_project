@@ -1,5 +1,7 @@
 package com.upc.ammm.dctransfers.models;
 
+import java.util.List;
+
 public class Pair {
 	private String source;
 	private String destination;
@@ -23,5 +25,20 @@ public class Pair {
 
 	public void setDestination(String destination) {
 		this.destination = destination;
+	}
+	
+	public static boolean containsPair(List<Pair> pairs, Pair p) {
+		boolean hasPair = false;
+		
+		for (Pair pair : pairs) {
+			if ((pair.getSource().equals(p.getSource()) && pair.getDestination().equals(p.getDestination())) || 
+				 pair.getSource().equals(p.getDestination()) && pair.getDestination().equals(p.getSource())) {
+				hasPair = true;
+				
+				break;
+			}
+		}
+		
+		return hasPair;
 	}
 }
