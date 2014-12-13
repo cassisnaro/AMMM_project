@@ -1,24 +1,24 @@
 package com.upc.ammm.dctransfers;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 import com.upc.ammm.dctransfers.models.Graph;
-import com.upc.ammm.dctransfers.models.Pair;
+import com.upc.ammm.dctransfers.models.NodePair;
+import com.upc.ammm.dctransfers.models.Path;
 
 public class ReadWithScanner {
 	
 	private final File fFilePath;
 	private final Charset ENCODING = StandardCharsets.UTF_8; 
 	private Graph graph = new Graph();
-	private ArrayList<Pair> transmissions = new ArrayList<Pair>();	
+	private ArrayList<Path> transmissions = new ArrayList<Path>();	
 
 	public ReadWithScanner() throws URISyntaxException, IOException {
         File fileParent= new File(System.getProperty("user.dir"));
@@ -34,7 +34,7 @@ public class ReadWithScanner {
 		return graph;
 	}
 	
-	public ArrayList<Pair> getTransmissions() {
+	public ArrayList<Path> getTransmissions() {
 		return transmissions;
 	}
 
@@ -54,7 +54,7 @@ public class ReadWithScanner {
 	}
 
 	public void processReadLine(String lineIdentifier, String line) {
-		if (lineIdentifier.equals("L")) {
+		if (lineIdentifier.equals("G")) {
 			String[] links = line.split(" ");
 			String n1;
 			String n2;
@@ -68,17 +68,15 @@ public class ReadWithScanner {
 				graph.addTwoWayVertex(n1, cost, n2, cost);
 			}
 		}
-		else if (lineIdentifier.equals("LT")) {
-			String[] links = line.split(" ");
-			String n1;
-			String n2;
+		else if (lineIdentifier.substring(0, 1).equals("T")) {			
+			LinkedList<NodePair> transmissionPath = new LinkedList<NodePair>();
+			String[] nodes = line.split(" ");
 
-			for (String l : links) {
-				n1 = l.substring(1, 2);
-				n2 = l.substring(3, 4);
-				
-				transmissions.add(new Pair(n1, n2));
+			for (String node : nodes) {				
+				transmissionPath.add(new NodePair(node, 0));
 			}
+			
+			transmissions.add(new Path(transmissionPath, 0));
 		}
 	}
 }

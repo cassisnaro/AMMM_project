@@ -8,13 +8,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.upc.ammm.dctransfers.models.Graph;
-import com.upc.ammm.dctransfers.models.Link;
-import com.upc.ammm.dctransfers.models.NodePair;
-import com.upc.ammm.dctransfers.models.Pair;
+import com.upc.ammm.dctransfers.models.Edge;
 import com.upc.ammm.dctransfers.models.Path;
 
 public class WriteWithPrintWriter {
@@ -22,9 +19,9 @@ public class WriteWithPrintWriter {
 	private final String fFilePath;
 	private final Charset ENCODING = StandardCharsets.UTF_8;
 	private Graph graph;
-	private ArrayList<Pair> transmissions;
+	private ArrayList<Path> transmissions;
 	
-	public WriteWithPrintWriter(Graph g, ArrayList<Pair> t) throws URISyntaxException, IOException {
+	public WriteWithPrintWriter(Graph g, ArrayList<Path> t) throws URISyntaxException, IOException {
 		this.graph = g;
 		this.transmissions = t;
 
@@ -37,72 +34,72 @@ public class WriteWithPrintWriter {
 		PrecomputePathsWithTransmissions precomputer = new PrecomputePathsWithTransmissions(graph);
 		
 		try (PrintWriter writer = new PrintWriter(fFilePath, ENCODING.name())) {
-			List<Pair> foundPaths = new ArrayList<Pair>();			
+			List<Edge> foundLinks = new ArrayList<Edge>();			
 			Set<String> nodes = graph.getNodes();
-			Pair auxPair;
-			ArrayList<Path> paths;
+			Edge auxPair;
+//			ArrayList<Path> paths;
 			ArrayList<Path> allPaths = new ArrayList<Path>();
-			String pathLine;
+//			String pathLine;
 			
 			for (String s : nodes) {
 				for (String d : nodes) {
 					if (!s.equals(d)) {
-						auxPair = new Pair(s, d);
+						auxPair = new Edge(s, d);
 
-						System.out.println("FOUND PATHS: ");
+//						System.out.println("FOUND PATHS: ");
+//						
+//						for (Edge pair : foundLinks) {
+//							System.out.print("(" + pair.getSource() + ", " + pair.getDestination() + ") ");
+//						}
+//						
+//						System.out.print("\n");
 						
-						for (Pair pair : foundPaths) {
-							System.out.print("(" + pair.getSource() + ", " + pair.getDestination() + ") ");
-						}
-						
-						System.out.print("\n");
-						
-						if (!Pair.containsPair(foundPaths, auxPair)) {
-							System.out.println("COMPUTING PATHS BETWEEN (" + s + ", " + d + ")");
+						if (!Edge.containsPair(foundLinks, auxPair)) {
+//							System.out.println("COMPUTING PATHS BETWEEN (" + s + ", " + d + ")");
 							
 							precomputer.precumputePathsFromTransmission(s, d);
 							
-							paths = precomputer.getPaths();
-							
-							System.out.println("------------ PATHS BETWEEN (" + s + ", " + d + ") OR (" + d + ", " + s + ") ------------");
-							System.out.println("------------ TOTAL: " + paths.size());
-							
-							for (Path p : paths) {
-								pathLine = "";
-								
-								for (NodePair node : p.getPath()) {
-									pathLine += node.getName() + " ";
-								}
-								
-								System.out.println(pathLine);								
-							}
+//							paths = precomputer.getPaths();
+//							
+//							System.out.println("------------ PATHS BETWEEN (" + s + ", " + d + ") OR (" + d + ", " + s + ") ------------");
+//							System.out.println("------------ TOTAL: " + paths.size());
+//							
+//							for (Path p : paths) {
+//								pathLine = "";
+//								
+//								for (NodePair node : p.getPath()) {
+//									pathLine += node.getName() + " ";
+//								}
+//								
+//								System.out.println(pathLine);								
+//							}
 							
 							allPaths.addAll(precomputer.getPaths());
 							
-							foundPaths.add(new Pair(s, d));
-							foundPaths.add(new Pair(d, s));
+							foundLinks.add(new Edge(s, d));
+							foundLinks.add(new Edge(d, s));
 						}
 					}
 				}
 			}
 			
-			System.out.println("TOTAL PATHS IN WHOLE GRAPH: " + allPaths.size());
+//			System.out.println("TOTAL PATHS IN WHOLE GRAPH: " + allPaths.size());
 			
-			Set<Link> links = graph.getLinks();
-			int linksSize = links.size();
+			Set<Edge> edges = graph.getEdges();
+			int linksSize = edges.size();
 			int allPathsSize = allPaths.size();
 			int auxCounter1;
 			int auxCounter2 = 1;
 			
 			writer.write("paths=[\n");
 			
-			for (Path p : allPaths) {
+			for (Path p : allPaths) {				
 				auxCounter1 = 1;
 				
 				writer.write("[");
 				
-				for (Link l : links) {
-					if (p.hasLink(l)) {
+				for (Edge e : edges) {
+					if (p.hasEdge(e)) {
 						writer.write("1");
 					}
 					else {
@@ -123,6 +120,41 @@ public class WriteWithPrintWriter {
 				}
 				
 				auxCounter2++;				
+			}
+			
+			writer.write("]\n\n");
+			
+			auxCounter2 = 1;
+			
+			writer.write("transmissions=[\n");
+			
+			for (Path t : transmissions) {				
+				auxCounter1 = 1;
+				
+				writer.write("[");
+				
+				for (Edge e : edges) {
+					if (t.hasEdge(e)) {
+						writer.write("1");
+					}
+					else {
+						writer.write("0");
+					}
+					
+					if (auxCounter1 < linksSize) {
+						writer.write(", ");
+					}
+					
+					auxCounter1++;
+				}
+				
+				writer.write("]");
+				
+				if (auxCounter2 < allPathsSize) {
+					writer.write(",\n");
+				}
+				
+				auxCounter2++;	
 			}
 			
 			writer.write("]\n");

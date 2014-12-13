@@ -2,8 +2,6 @@ package com.upc.ammm.dctransfers.models;
 
 import java.util.LinkedList;
 
-import com.oracle.jrockit.jfr.ValueDefinition;
-
 public class Path {
 	private LinkedList<NodePair> path;
 	private int cost;
@@ -29,13 +27,15 @@ public class Path {
 		this.cost = cost;
 	}
 	
-	public boolean hasLink(Link l) {
+	public boolean hasEdge(Edge e) {
 		boolean hasLink = false;
 		int pathSize = path.size();
 		String previousNode = path.get(0).getName(); 	
 		
 		for (int i = 1; i < pathSize; i++) {
-			if (l.isEqual(new Link(previousNode, path.get(i).getName()))) {
+//			System.out.println("COMPARING: (" + previousNode + "," + path.get(i).getName() + ") WITH (" + e.getSource() + "," + e.getDestination() + ")");
+			if (e.isEqual(new Edge(previousNode, path.get(i).getName()))) {
+//				System.out.println("IS EQUAL!");
 				hasLink = true;
 				break;
 			}

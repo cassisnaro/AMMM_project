@@ -1,4 +1,12 @@
-L
+G
 (a,b,1) (a,c,1) (a,d,1) (a,e,1) (b,c,1) (b,d,1) (b,e,1) (c,d,1) (c,e,1) (d,e,1)
-LT
-(a,c) (d,e)
+T1
+a b c
+T2
+a b d
+T3
+e a d c
+T4
+b e d c
+T5
+e d b
