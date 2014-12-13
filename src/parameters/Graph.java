@@ -1,11 +1,6 @@
-package com.upc.ammm.dctransfers.models;
+package parameters;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Graph {
 	private Map<String, LinkedHashSet<NodePair>> map = new HashMap<String, LinkedHashSet<NodePair>>();

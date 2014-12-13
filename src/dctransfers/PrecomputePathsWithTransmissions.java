@@ -1,11 +1,13 @@
-package com.upc.ammm.dctransfers;
+package dctransfers;
+
+import parameters.Graph;
+import parameters.NodePair;
+import parameters.Path;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import com.upc.ammm.dctransfers.models.Graph;
-import com.upc.ammm.dctransfers.models.NodePair;
-import com.upc.ammm.dctransfers.models.Path;
+
 
 public class PrecomputePathsWithTransmissions {
 	

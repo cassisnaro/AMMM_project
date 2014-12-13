@@ -1,4 +1,8 @@
-package com.upc.ammm.dctransfers;
+package Reader;
+
+import parameters.Graph;
+import parameters.NodePair;
+import parameters.Path;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,10 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
-
-import com.upc.ammm.dctransfers.models.Graph;
-import com.upc.ammm.dctransfers.models.NodePair;
-import com.upc.ammm.dctransfers.models.Path;
 
 public class ReadWithScanner {
 	

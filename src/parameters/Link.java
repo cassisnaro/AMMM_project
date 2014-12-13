@@ -1,4 +1,4 @@
-package com.upc.ammm.dctransfers.models;
+package parameters;
 
 /**
  * Created by daniel on 30/11/14.

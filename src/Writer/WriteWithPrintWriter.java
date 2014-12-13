@@ -1,4 +1,9 @@
-package com.upc.ammm.dctransfers;
+package Writer;
+
+import dctransfers.PrecomputePathsWithTransmissions;
+import parameters.Edge;
+import parameters.Graph;
+import parameters.Path;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,10 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import com.upc.ammm.dctransfers.models.Graph;
-import com.upc.ammm.dctransfers.models.Edge;
-import com.upc.ammm.dctransfers.models.Path;
 
 public class WriteWithPrintWriter {
 	

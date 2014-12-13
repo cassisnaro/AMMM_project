@@ -11,7 +11,7 @@ import java.io.FileOutputStream;
 /**
  * Created by daniel on 5/12/14.
  */
-public class Writer {
+public class WriterILP {
     public static void main(String[] args){
         TransferCollections transferCollections = new TransferCollections(3);
         transferCollections.add_transfer(new Transfer(0,1,4,3));

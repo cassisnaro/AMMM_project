@@ -1,4 +1,4 @@
-package com.upc.ammm.dctransfers.models;
+package parameters;
 
 public class NodePair {
 	String name;
