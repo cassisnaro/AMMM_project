@@ -327,9 +327,9 @@ public class TransferCollections {
             }else{
                 System.out.println("Problem");
             }
-            printStream.print("];");
+            printStream.print("]");
         }
-        printStream.print("]");
+        printStream.print("];");
         printStream.close();
 
     }
