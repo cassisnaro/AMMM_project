@@ -85,32 +85,54 @@ subject to{
 
 }
 execute {
-	writeln("SLICES USED IN A0");
+	write("Requested: ");
+	for(var na=1; na<=nA; na++){
+		for(var np=1; np<=nP; np++){
+			if(x_ap[na][np]==1){
+				write("over edges:");
+				for(var ne=1; ne<nE; ne++){
+					write(rho_pe[np][ne]+" ");		  
+         		}
+         		writeln("");
+         		write("a: over slices: ");
+         		for(var ns=1; ns<=nS ;ns++){
+	    			write(mA[na][ns]+" ");
+	    		}
+				write(" for time: ");
+				for(var nt=1; nt<=nT ;nt++){
+					write(gamma_at[na][nt]+" ");
+				} 
+			}  	      
+		}
+	}
+	writeln("");    	    
+	writeln("old transferences: ");
 	for(var nr=1; nr<=nR; nr++){
 		write("Transfer " + nr+": ");
 		for(var na0=1; na0<=nA0; na0++){
 			if(x_ar_0[nr][na0]==1){
+			  	write("A0: slices: ");
 		    	for(var ns=1; ns<=nS ;ns++){
 		    		write(mA0[nr][na0][ns]+" ");
-		    	}	    	
+		    	}	   
+		    	write("  time:");
+		    	for(var nt=1; nt<=nT ;nt++){
+		    		write(gamma_a0t[nr][na0][nt]+" ");
+		    	} 	
 			}		    
 		}
-		writeln("");		
-	}
-	writeln("");
-};
-
-execute {
-	writeln("SLICES USED IN A1");
-	for(var nr=1; nr<=nR; nr++){
-		write("Transfer " + nr+": ");
 		for(var na1=1; na1<=nA1; na1++){
 			if(x_ar_1[nr][na1]==1){
+			  	write("  A1: slices: ");
 		    	for(var ns=1; ns<=nS ;ns++){
 		    		write(mA1[nr][na1][ns]+" ");
-		    	}	    	
+		    	}	   
+		    	write("  time:");
+		    	for(var nt=1; nt<=nT ;nt++){
+		    		write(gamma_a1t[nr][na1][nt]+" ");
+		    	} 	
 			}		    
-		}
+		}		
 		writeln("");		
 	}
 };

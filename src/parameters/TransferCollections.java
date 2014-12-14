@@ -329,7 +329,7 @@ public class TransferCollections {
             }
             printStream.print("]");
         }
-        printStream.print("]");
+        printStream.print("];");
         printStream.close();
 
     }
