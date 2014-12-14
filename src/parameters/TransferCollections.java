@@ -297,6 +297,39 @@ public class TransferCollections {
             printStream.print("]\n");
         }
         printStream.print("];\n");
+
+        printStream.print("omega_ar=[");
+        for(Transfer transfer: transfers) {
+            A0s.clear();
+            A0s.addAll(transfer.getA0());
+            printStream.print("[");
+            boolean first = true;
+            boolean found = false;
+            for (Rectangle rectangle : A0s) {
+                if (first) {
+                    first = false;
+                } else {
+                    printStream.print(", ");
+                }
+                if (transfer.rectangleConformantAllocation(rectangle)) {
+                    printStream.print("1");
+                    found = true;
+                } else {
+                    printStream.print("0");
+                }
+
+            }
+            for (int extraRectangleA0 = A0s.size(); extraRectangleA0 < maxA0; extraRectangleA0++) {
+                printStream.print(", 0");
+            }
+            if (found){
+                System.out.println("OK");
+            }else{
+                System.out.println("Problem");
+            }
+            printStream.print("];");
+        }
+        printStream.print("]");
         printStream.close();
 
     }

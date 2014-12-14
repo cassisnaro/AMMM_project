@@ -124,10 +124,56 @@ public class WriteWithPrintWriter {
 			}
 			
 			writer.write("]\n\n");
+
+            String requestedTransferStart=new String("a");
+            String requestedTransferEnd=new String("d");
+            ArrayList<Path> pathsForRequestedTransfer = new ArrayList<Path>();
+            precomputer.precumputePathsFromTransmission(requestedTransferStart,requestedTransferEnd);
+            pathsForRequestedTransfer.addAll(precomputer.getPaths());
+
+
+            edges = graph.getEdges();
+            linksSize = edges.size();
+            allPathsSize = allPaths.size();
+            auxCounter2 = 1;
+
+            writer.write("nP="+pathsForRequestedTransfer.size()+";\n");
+            writer.write("rho_pe=[\n");
+
+            for (Path p : pathsForRequestedTransfer) {
+                auxCounter1 = 1;
+
+                writer.write("[");
+
+                for (Edge e : edges) {
+                    if (p.hasEdge(e)) {
+                        writer.write("1");
+                    }
+                    else {
+                        writer.write("0");
+                    }
+
+                    if (auxCounter1 < linksSize) {
+                        writer.write(", ");
+                    }
+
+                    auxCounter1++;
+                }
+
+                writer.write("]");
+
+                if (auxCounter2 < pathsForRequestedTransfer.size()) {
+                    writer.write(",\n");
+                }
+
+                auxCounter2++;
+            }
+
+            writer.write("];\n\n");
 			
 			auxCounter2 = 1;
 			
-			writer.write("transmissions=[\n");
+			writer.write("rho_re=[\n");
 			
 			for (Path t : transmissions) {				
 				auxCounter1 = 1;
@@ -158,7 +204,9 @@ public class WriteWithPrintWriter {
 				auxCounter2++;	
 			}
 			
-			writer.write("]\n");
+			writer.write("];\n");
+
+            writer.write("nE="+edges.size()+";");
 			
 //			for (Pair t : transmissions) {
 //				precomputer.precumputePathsFromTransmission(t.getSource(), t.getDestination());

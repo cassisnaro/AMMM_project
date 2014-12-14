@@ -11,17 +11,40 @@ public class Transfer {
     int node_destination;
     int time_completion;
     int data_amount;
-    Set<Integer> currentSlices;
     Set<Integer> tmpSlices;
     Set<Rectangle> A0;
     Set<Rectangle> A1;
     Set<RectanglePair> feasiblePairs;
+
+    Set<Integer> currentSlices;
+    int currentMaxTime;
 
     public Transfer(int node_origin, int node_destination, int time_completion, int data_amount) {
         this.node_origin = node_origin;
         this.node_destination = node_destination;
         this.time_completion = time_completion;
         this.data_amount = data_amount;
+    }
+
+    public void setCurrentAllocation(int minCurrentSlices, int maxCurrentSlices, int currentMaxTime){
+        setCurrentSlices(minCurrentSlices, maxCurrentSlices);
+        this.currentMaxTime=currentMaxTime;
+    }
+
+    public boolean rectangleConformantAllocation(Rectangle rectangle){
+        if(rectangle.getT_end()!=currentMaxTime) return false;
+        boolean slicesEquals=true;
+        if(rectangle.getFrequencySlices().size()==currentSlices.size()){
+            for(Integer slice:currentSlices){
+                if(!rectangle.getFrequencySlices().contains(slice)){
+                    slicesEquals=false;
+                    break;
+                }
+            }
+        } else {
+            slicesEquals=false;
+        }
+        return (slicesEquals);
     }
 
     public void validate_reschedule(){

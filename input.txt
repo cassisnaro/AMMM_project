@@ -1,12 +1,14 @@
 G
-(a,b,1) (a,c,1) (a,d,1) (a,e,1) (b,c,1) (b,d,1) (b,e,1) (c,d,1) (c,e,1) (d,e,1)
+(a,b,1) (b,c,1) (b,d,1) (c,d,1) (d,f,1) (d,e,1) (e,g,1) (f,g,1)
 T1
-a b c
+a b c d f g
 T2
-a b d
+b c
 T3
-e a d c
+b d c
 T4
-b e d c
+d f g
 T5
-e d b
+d e g
+T6
+b d e g
