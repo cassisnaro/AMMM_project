@@ -84,3 +84,16 @@ subject to{
 	z == sum(r in R) y_r[r];
 
 }
+execute {
+	for(var nr=1; nr<=nR; nr++){
+		write(nr+": ");
+		for(var na0=1; na0<=nA0; na0++){
+			if(x_ar_0[nr][na0]==1){
+		    	for(var ns=1; ns<=nS ;ns++){
+		    		write(mA0[nr][na0][ns]+" ");
+		    	}	    	
+			}		    
+		}
+		writeln("");		
+	}
+};
