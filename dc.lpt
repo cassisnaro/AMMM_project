@@ -85,12 +85,29 @@ subject to{
 
 }
 execute {
+	writeln("SLICES USED IN A0");
 	for(var nr=1; nr<=nR; nr++){
-		write(nr+": ");
+		write("Transfer " + nr+": ");
 		for(var na0=1; na0<=nA0; na0++){
 			if(x_ar_0[nr][na0]==1){
 		    	for(var ns=1; ns<=nS ;ns++){
 		    		write(mA0[nr][na0][ns]+" ");
+		    	}	    	
+			}		    
+		}
+		writeln("");		
+	}
+	writeln("");
+};
+
+execute {
+	writeln("SLICES USED IN A1");
+	for(var nr=1; nr<=nR; nr++){
+		write("Transfer " + nr+": ");
+		for(var na1=1; na1<=nA1; na1++){
+			if(x_ar_1[nr][na1]==1){
+		    	for(var ns=1; ns<=nS ;ns++){
+		    		write(mA1[nr][na1][ns]+" ");
 		    	}	    	
 			}		    
 		}

@@ -135,7 +135,7 @@ public class WriteWithPrintWriter {
             edges = graph.getEdges();
             linksSize = edges.size();
             allPathsSize = allPaths.size();
-            auxCounter2 = 1;
+//            auxCounter2 = 1;
 
             writer.write("nP="+pathsForRequestedTransfer.size()+";\n");
             writer.write("rho_pe=[\n");
@@ -160,18 +160,18 @@ public class WriteWithPrintWriter {
                     auxCounter1++;
                 }
 
-                writer.write("]");
+                writer.write("]\n");
 
-                if (auxCounter2 < pathsForRequestedTransfer.size()) {
-                    writer.write(",\n");
-                }
-
-                auxCounter2++;
+//                if (auxCounter2 < pathsForRequestedTransfer.size()) {
+//                    writer.write(",\n");
+//                }
+//
+//                auxCounter2++;
             }
 
             writer.write("];\n\n");
 			
-			auxCounter2 = 1;
+//			auxCounter2 = 1;
 			
 			writer.write("rho_re=[\n");
 			
@@ -195,13 +195,13 @@ public class WriteWithPrintWriter {
 					auxCounter1++;
 				}
 				
-				writer.write("]");
+				writer.write("]\n");
 				
-				if (auxCounter2 < allPathsSize) {
-					writer.write(",\n");
-				}
-				
-				auxCounter2++;	
+//				if (auxCounter2 < allPathsSize) {
+//					writer.write(",\n");
+//				}
+//				
+//				auxCounter2++;	
 			}
 			
 			writer.write("];\n");
