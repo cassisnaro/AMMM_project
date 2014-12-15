@@ -19,8 +19,20 @@ public class RequestedTransfer {
         this.data_amount = data_amount;
     }
 
+    public int getNode_origin() {
+        return node_origin;
+    }
+    
+    public int getNode_destination() {
+    	return node_destination;
+    }
+    
     public int getTime_completion() {
         return time_completion;
+    }
+    
+    public int getData_amount() {
+    	return data_amount;
     }
 
     public Set<Rectangle> getA() {
