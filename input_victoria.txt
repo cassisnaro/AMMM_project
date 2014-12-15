@@ -1,0 +1,20 @@
+N
+a b c d e f
+G
+(a,b,1) (a,d,1) (a,b,1) (b,e,1) (c,f,1) (d,e,1) (e,f,1)
+T1
+d e 
+T2
+a d e
+T3
+d e f
+T4
+e f
+T5
+b e f
+T6
+c f e
+T7
+a d e f
+RT
+a f 4 5

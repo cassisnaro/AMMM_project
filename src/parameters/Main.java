@@ -1,17 +1,18 @@
 package parameters;
 
+import Reader.ReadWithScanner;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Iterator;
+
+import Reader.ReadWithScanner;
 //import Reader.ReadWithScanner;
 import dctransfers.PrecomputePathsWithTransmissions;
 
 public class Main {
-	//private String source;
-	//private String destination;
 	private static List<Transfer> T;
 	private static Collection<Integer> S;
 	private static int slicesNeeded;
@@ -27,27 +28,8 @@ public class Main {
 	
 	
 	public static void main(String[] args) throws IOException, URISyntaxException {
-		TransferCollections transferCollections = new TransferCollections(5);
-        Transfer newTransfer = new Transfer(0,6,4,6);
-        newTransfer.setCurrentAllocation(0,2,2);
-        transferCollections.add_transfer(newTransfer);
-        newTransfer = new Transfer(1,2,3,3);
-        newTransfer.setCurrentAllocation(3,4,2);
-        transferCollections.add_transfer(newTransfer);
-        newTransfer = new Transfer(1,2,3,3);
-        newTransfer.setCurrentAllocation(3,4,2);
-        transferCollections.add_transfer(newTransfer);
-        newTransfer = new Transfer(3,6,2,3);
-        newTransfer.setCurrentAllocation(3, 4, 2);
-        transferCollections.add_transfer(newTransfer);
-        newTransfer = new Transfer(3,6,2,2);
-        newTransfer.setCurrentAllocation(2,3,1);
-        transferCollections.add_transfer(newTransfer);
-        newTransfer = new Transfer(1,6,5,3);
-        newTransfer.setCurrentAllocation(0,1,2);
-        transferCollections.add_transfer(newTransfer);
-        transferCollections.setRequestedTransfer(new RequestedTransfer(0,3,2,3));
-        reqT = transferCollections.getRequestedTransfer();
+		ReadWithScanner parser = new ReadWithScanner();
+		reqT = parser.getRequestedTransfer();
         int tempSource = reqT.getNode_origin();
         int tempDestination = reqT.getNode_destination();
         String source = "" + tempSource;
@@ -55,7 +37,6 @@ public class Main {
         int data = reqT.getData_amount();
         int timeComp = reqT.getTime_completion();
         slicesNeeded = (int) Math.ceil(data/timeComp);
-        T = transferCollections.getTransfers();
         getP.precumputePathsFromTransmission(source, destination);
 		P = getP.getPaths();
 		Iterator<Path> p_it = P.iterator();
@@ -93,6 +74,7 @@ public class Main {
 								temp_s = s1;
 							} else {
 								int pos = temp_s.intValue();
+								T = e.getTransfers();
 								for (int i = 0; i < T.size(); i++) {
 									t = T.get(i);
 									int slicesFree = t.maximize_free_room(pos, true);
