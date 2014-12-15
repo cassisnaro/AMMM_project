@@ -10,6 +10,6 @@ public class Main {
 
 	public static void main(String... aArgs) throws IOException, URISyntaxException {
 		ReadWithScanner parser = new ReadWithScanner();
-		WriteWithPrintWriter writer = new WriteWithPrintWriter(parser.getGraph(), parser.getTransmissions(), parser.getRequestedTransmission());
+		WriteWithPrintWriter writer = new WriteWithPrintWriter(parser.getGraph(), parser.getTransmissions(), parser.getRequestedTransfer());
 	}
 }

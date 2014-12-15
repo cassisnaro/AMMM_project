@@ -5,8 +5,10 @@ import java.util.*;
 public class Graph {
 	private Map<String, LinkedHashSet<NodePair>> map = new HashMap<String, LinkedHashSet<NodePair>>();
     private Map<Edge, Integer> edgesIdentifier = new HashMap<>();
-    private int identifierCount = 0;
+    private int edgeIdentifierCount = 0;
     private ArrayList<Path> paths;
+    private Map<String, Integer> nodesIdentifier = new HashMap<>();
+    private int nodeIdentifierCount = 0;
 
     public void addEdge(String node1, String node2, int node2Cost) {
         LinkedHashSet<NodePair> adjacent = map.get(node1);
@@ -19,13 +21,37 @@ public class Graph {
         adjacent.add(new NodePair(node2, node2Cost));
 
     }
+    
+    public void addNode(String node) {
+    	nodesIdentifier.put(node, nodeIdentifierCount);
+    	
+    	nodeIdentifierCount++;
+    }
+    
+    public Integer getNodeIdentifier(String node) {
+    	return nodesIdentifier.get(node);
+    }
+    
+    public String getNodeNameFromIdentifier(int identifier) {
+    	String nodeName = "";
+    	Set<String> nodeNames = nodesIdentifier.keySet();
+    	
+    	for (String nName : nodeNames) {
+    		if (nodesIdentifier.get(nName).intValue() == identifier) {
+    			nodeName = nName;
+    			break;
+    		}
+    	}
+    	
+    	return nodeName;
+    }
 
     public void addTwoWayVertex(String node1, int node1Cost, String node2, int node2Cost) {
         addEdge(node1, node2, node2Cost);
         addEdge(node2, node1, node1Cost);
 
-        edgesIdentifier.put(new Edge(node1,node2), new Integer(identifierCount));
-        identifierCount++;
+        edgesIdentifier.put(new Edge(node1,node2), new Integer(edgeIdentifierCount));
+        edgeIdentifierCount++;
     }
 
     public boolean isConnected(String node1, NodePair node2) {

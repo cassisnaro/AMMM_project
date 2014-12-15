@@ -12,6 +12,7 @@ public class RequestedTransfer {
     int time_completion;
     int data_amount;
     Set<Rectangle> A;
+    
     public RequestedTransfer(int node_origin, int node_destination, int time_completion, int data_amount) {
         this.node_origin = node_origin;
         this.node_destination = node_destination;
@@ -19,7 +20,23 @@ public class RequestedTransfer {
         this.data_amount = data_amount;
     }
 
-    public int getTime_completion() {
+    public int getNode_origin() {
+		return node_origin;
+	}
+
+	public void setNode_origin(int node_origin) {
+		this.node_origin = node_origin;
+	}
+
+	public int getNode_destination() {
+		return node_destination;
+	}
+
+	public void setNode_destination(int node_destination) {
+		this.node_destination = node_destination;
+	}
+
+	public int getTime_completion() {
         return time_completion;
     }
 

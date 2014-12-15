@@ -3,6 +3,7 @@ package Reader;
 import parameters.Graph;
 import parameters.NodePair;
 import parameters.Path;
+import parameters.RequestedTransfer;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class ReadWithScanner {
 	private final Charset ENCODING = StandardCharsets.UTF_8; 
 	private Graph graph = new Graph();
 	private ArrayList<Path> transmissions = new ArrayList<Path>();
-	private Path requestedTransmission;
+	private RequestedTransfer requestedTransfer;
 
 	public ReadWithScanner() throws URISyntaxException, IOException {
         File fileParent= new File(System.getProperty("user.dir"));
@@ -39,8 +40,8 @@ public class ReadWithScanner {
 		return transmissions;
 	}
 	
-	public Path getRequestedTransmission() {
-		return requestedTransmission;
+	public RequestedTransfer getRequestedTransfer() {
+		return requestedTransfer;
 	}
 
 	public void processReadLineByLine() throws IOException {
@@ -59,7 +60,14 @@ public class ReadWithScanner {
 	}
 
 	public void processReadLine(String lineIdentifier, String line) {
-		if (lineIdentifier.equals("G")) {
+		if (lineIdentifier.equals("N")) {
+			String[] nodes = line.split(" ");
+			
+			for (String node : nodes) {
+				graph.addNode(node);
+			}
+		}
+		else if (lineIdentifier.equals("G")) {
 			String[] links = line.split(" ");
 			String n1;
 			String n2;
@@ -84,14 +92,9 @@ public class ReadWithScanner {
 			transmissions.add(new Path(transmissionPath, 0));
 		}
 		else if (lineIdentifier.substring(0, 1).equals("R")) {			
-			LinkedList<NodePair> transmissionPath = new LinkedList<NodePair>();
-			String[] nodes = line.split(" ");
+			String[] requestedTransferInfo = line.split(" ");
 
-			for (String node : nodes) {				
-				transmissionPath.add(new NodePair(node, 0));
-			}
-			
-			requestedTransmission = new Path(transmissionPath, 0);
+			requestedTransfer = new RequestedTransfer(graph.getNodeIdentifier(requestedTransferInfo[0]), graph.getNodeIdentifier(requestedTransferInfo[1]), Integer.parseInt(requestedTransferInfo[2]), Integer.parseInt(requestedTransferInfo[3]));
 		}
 	}
 }

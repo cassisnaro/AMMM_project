@@ -5,6 +5,7 @@ import parameters.Edge;
 import parameters.Graph;
 import parameters.NodePair;
 import parameters.Path;
+import parameters.RequestedTransfer;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,12 +23,12 @@ public class WriteWithPrintWriter {
 	private final Charset ENCODING = StandardCharsets.UTF_8;
 	private Graph graph;
 	private ArrayList<Path> transmissions;
-	private Path requestedTransmission;
+	private RequestedTransfer requestedTransfer;
 	
-	public WriteWithPrintWriter(Graph g, ArrayList<Path> t, Path rt) throws URISyntaxException, IOException {
+	public WriteWithPrintWriter(Graph g, ArrayList<Path> t, RequestedTransfer rt) throws URISyntaxException, IOException {
 		this.graph = g;
 		this.transmissions = t;
-		this.requestedTransmission = rt;
+		this.requestedTransfer = rt;
 
         File fileParent= new File(System.getProperty("user.dir"));
         fFilePath = new File(fileParent,"output_P_gaby_v1.txt").getPath();
@@ -132,7 +133,7 @@ public class WriteWithPrintWriter {
 //            String requestedTransferStart=new String("a");
 //            String requestedTransferEnd=new String("e");
             ArrayList<Path> pathsForRequestedTransfer = new ArrayList<Path>();
-            precomputer.precumputePathsFromTransmission(requestedTransmission.getPath().get(0).getName(), requestedTransmission.getPath().get(requestedTransmission.getPath().size()-1).getName());
+            precomputer.precumputePathsFromTransmission(graph.getNodeNameFromIdentifier(requestedTransfer.getNode_origin()), graph.getNodeNameFromIdentifier(requestedTransfer.getNode_destination()));
             pathsForRequestedTransfer.addAll(precomputer.getPaths());
 
 
