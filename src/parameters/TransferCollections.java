@@ -28,6 +28,14 @@ public class TransferCollections {
         this.requestedTransfer = requestedTransfer;
         requestedTransfer.computeRectanglesSet(maxFreq);
     }
+    
+    public RequestedTransfer getRequestedTransfer() {
+        return requestedTransfer;
+    }
+    
+    public List<Transfer> getTransfers() {
+    	return transfers;
+    }
 
     public void add_transfer(Transfer transfer){
         transfer.computeRectanglesSets(maxFreq);
