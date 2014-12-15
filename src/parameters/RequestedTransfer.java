@@ -39,6 +39,10 @@ public class RequestedTransfer {
 	public int getTime_completion() {
         return time_completion;
     }
+    
+    public int getData_amount() {
+    	return data_amount;
+    }
 
     public Set<Rectangle> getA() {
         return A;
