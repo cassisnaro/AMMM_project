@@ -4,6 +4,8 @@ import parameters.Graph;
 import parameters.NodePair;
 import parameters.Path;
 import parameters.RequestedTransfer;
+import parameters.Transfer;
+import parameters.TransferCollections;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +23,8 @@ public class ReadWithScanner {
 	private Graph graph = new Graph();
 	private ArrayList<Path> transmissions = new ArrayList<Path>();
 	private RequestedTransfer requestedTransfer;
+	private int numSlices;
+	private TransferCollections transferCollections;
 
 	public ReadWithScanner() throws URISyntaxException, IOException {
         File fileParent= new File(System.getProperty("user.dir"));
@@ -60,7 +64,12 @@ public class ReadWithScanner {
 	}
 
 	public void processReadLine(String lineIdentifier, String line) {
-		if (lineIdentifier.equals("N")) {
+		if (lineIdentifier.equals("S")) {
+			numSlices = Integer.parseInt(line);
+			
+			transferCollections = new TransferCollections(numSlices);
+		}
+		else if (lineIdentifier.equals("N")) {
 			String[] nodes = line.split(" ");
 			
 			for (String node : nodes) {
@@ -83,13 +92,49 @@ public class ReadWithScanner {
 		}
 		else if (lineIdentifier.substring(0, 1).equals("T")) {			
 			LinkedList<NodePair> transmissionPath = new LinkedList<NodePair>();
-			String[] nodes = line.split(" ");
+			String[] data = line.split(" ");
+			boolean foundSeparator = false;
+			int separatorIndex = 0;
+			Transfer auxTransfer;
+			int auxNodeOrigin;
+			int auxNodeDestination;
+			int auxTimeCompletion;
+			int auxDataAmount;
+			int auxMinCurrentSlices;
+			int auxMaxCurrentSlices;
+			int auxCurrentMaxTime;
 
-			for (String node : nodes) {				
-				transmissionPath.add(new NodePair(node, 0));
+			for (String d : data) {
+				if (d.equals("/")) {
+					foundSeparator = true;
+					
+					continue;
+				}
+				
+				if (!foundSeparator) {
+					transmissionPath.add(new NodePair(d, 0));
+				}			
+				else {
+					break;
+				}
+				
+				separatorIndex++;
 			}
 			
 			transmissions.add(new Path(transmissionPath, 0));
+			
+			auxNodeOrigin = graph.getNodeIdentifier(transmissionPath.get(0).getName());
+			auxNodeDestination = graph.getNodeIdentifier(transmissionPath.get(transmissionPath.size() - 1).getName());
+			auxTimeCompletion = Integer.parseInt(data[separatorIndex + 1]);
+			auxDataAmount = Integer.parseInt(data[separatorIndex + 2]);
+			auxMinCurrentSlices = Integer.parseInt(data[separatorIndex + 3]);
+			auxMaxCurrentSlices = Integer.parseInt(data[separatorIndex + 4]);
+			auxCurrentMaxTime = Integer.parseInt(data[separatorIndex + 5]);
+			
+			auxTransfer = new Transfer(auxNodeOrigin, auxNodeDestination, auxTimeCompletion, auxDataAmount);
+			auxTransfer.setCurrentAllocation(auxMinCurrentSlices, auxMaxCurrentSlices, auxCurrentMaxTime);
+			
+			transferCollections.add_transfer(auxTransfer);
 		}
 		else if (lineIdentifier.substring(0, 1).equals("R")) {			
 			String[] requestedTransferInfo = line.split(" ");
