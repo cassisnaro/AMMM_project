@@ -63,6 +63,7 @@ public class Main {
 									t = T.get(i);
 									int slicesFree = t.maximize_free_room(pos, true);
 									if(slicesFree == temp_slicesNeeded){
+										t.validate_reschedule();
 										nrR = nrR + 1;
 										System.out.format("Transfer can be assigned with nr of reschedulings: %d", nrR);
 									}
