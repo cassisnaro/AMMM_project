@@ -1,0 +1,16 @@
+G
+(a,b,1) (a,d,1) (b,c,1) (b,e,1) (c,f,1) (d,e,1) (e,f,1)
+T1
+a d e b c f
+T2
+a b c
+T3
+d e f
+T4
+b e d
+T5
+e f
+T6
+c f e
+RT
+a e

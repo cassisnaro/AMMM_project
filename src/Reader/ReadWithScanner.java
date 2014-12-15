@@ -18,11 +18,12 @@ public class ReadWithScanner {
 	private final File fFilePath;
 	private final Charset ENCODING = StandardCharsets.UTF_8; 
 	private Graph graph = new Graph();
-	private ArrayList<Path> transmissions = new ArrayList<Path>();	
+	private ArrayList<Path> transmissions = new ArrayList<Path>();
+	private Path requestedTransmission;
 
 	public ReadWithScanner() throws URISyntaxException, IOException {
         File fileParent= new File(System.getProperty("user.dir"));
-		fFilePath = new File(fileParent,"input_gaby.txt");
+		fFilePath = new File(fileParent,"input_gaby_v1.txt");
 		processReadLineByLine();
 	}
 	
@@ -36,6 +37,10 @@ public class ReadWithScanner {
 	
 	public ArrayList<Path> getTransmissions() {
 		return transmissions;
+	}
+	
+	public Path getRequestedTransmission() {
+		return requestedTransmission;
 	}
 
 	public void processReadLineByLine() throws IOException {
@@ -77,6 +82,16 @@ public class ReadWithScanner {
 			}
 			
 			transmissions.add(new Path(transmissionPath, 0));
+		}
+		else if (lineIdentifier.substring(0, 1).equals("R")) {			
+			LinkedList<NodePair> transmissionPath = new LinkedList<NodePair>();
+			String[] nodes = line.split(" ");
+
+			for (String node : nodes) {				
+				transmissionPath.add(new NodePair(node, 0));
+			}
+			
+			requestedTransmission = new Path(transmissionPath, 0);
 		}
 	}
 }

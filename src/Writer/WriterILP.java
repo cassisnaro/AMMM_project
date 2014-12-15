@@ -37,7 +37,7 @@ public class WriterILP {
     	
         TransferCollections transferCollections = new TransferCollections(5);
         Transfer newTransfer = new Transfer(0,5,6,6);
-        newTransfer.setCurrentAllocation(0,1,3);
+        newTransfer.setCurrentAllocation(0,1,3);        
         transferCollections.add_transfer(newTransfer);
         newTransfer = new Transfer(0,2,3,3);
         newTransfer.setCurrentAllocation(2,2,3);
@@ -52,13 +52,13 @@ public class WriterILP {
         newTransfer.setCurrentAllocation(0,1,3);
         transferCollections.add_transfer(newTransfer);
         newTransfer = new Transfer(2,4,5,2);
-        newTransfer.setCurrentAllocation(3,3,2);
+        newTransfer.setCurrentAllocation(2,2,2);
         transferCollections.add_transfer(newTransfer);
         transferCollections.setRequestedTransfer(new RequestedTransfer(0,4,3,5));
 
         File fileParent= new File(System.getProperty("user.dir"));
         try {
-            transferCollections.formatData(new FileOutputStream(new File(fileParent,"output_T_gaby.txt").getPath()));
+            transferCollections.formatData(new FileOutputStream(new File(fileParent,"output_T_gaby_v1.txt").getPath()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

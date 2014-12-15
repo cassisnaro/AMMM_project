@@ -22,13 +22,15 @@ public class WriteWithPrintWriter {
 	private final Charset ENCODING = StandardCharsets.UTF_8;
 	private Graph graph;
 	private ArrayList<Path> transmissions;
+	private Path requestedTransmission;
 	
-	public WriteWithPrintWriter(Graph g, ArrayList<Path> t) throws URISyntaxException, IOException {
+	public WriteWithPrintWriter(Graph g, ArrayList<Path> t, Path rt) throws URISyntaxException, IOException {
 		this.graph = g;
 		this.transmissions = t;
+		this.requestedTransmission = rt;
 
         File fileParent= new File(System.getProperty("user.dir"));
-        fFilePath = new File(fileParent,"output_gaby2.txt").getPath();
+        fFilePath = new File(fileParent,"output_P_gaby_v1.txt").getPath();
 		processWriteLineByLine();
 	}
 	
@@ -127,10 +129,10 @@ public class WriteWithPrintWriter {
 			
 			writer.write("]\n\n");
 
-            String requestedTransferStart=new String("a");
-            String requestedTransferEnd=new String("e");
+//            String requestedTransferStart=new String("a");
+//            String requestedTransferEnd=new String("e");
             ArrayList<Path> pathsForRequestedTransfer = new ArrayList<Path>();
-            precomputer.precumputePathsFromTransmission(requestedTransferStart,requestedTransferEnd);
+            precomputer.precumputePathsFromTransmission(requestedTransmission.getPath().get(0).getName(), requestedTransmission.getPath().get(requestedTransmission.getPath().size()-1).getName());
             pathsForRequestedTransfer.addAll(precomputer.getPaths());
 
 
@@ -139,6 +141,7 @@ public class WriteWithPrintWriter {
             allPathsSize = allPaths.size();
 //            auxCounter2 = 1;
 
+            writer.write("nE="+edges.size()+";\n");
             writer.write("nP="+pathsForRequestedTransfer.size()+";\n");
             writer.write("rho_pe=[\n");
 
@@ -215,8 +218,6 @@ public class WriteWithPrintWriter {
 			}
 			
 			writer.write("];\n");
-
-            writer.write("nE="+edges.size()+";");
 			
 //			for (Pair t : transmissions) {
 //				precomputer.precumputePathsFromTransmission(t.getSource(), t.getDestination());
