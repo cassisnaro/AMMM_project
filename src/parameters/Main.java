@@ -5,35 +5,63 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.Iterator;
-
-import Reader.ReadWithScanner;
+//import Reader.ReadWithScanner;
+import dctransfers.PrecomputePathsWithTransmissions;
 
 public class Main {
 	//private String source;
 	//private String destination;
-	private List<Transfer> T;
-	private Collection<Integer> S;
-	private Integer slicesNeeded;
-	private ArrayList<Path> P;
-	private Path p;
-	private Collection<Integer> allSlices; 
-	private Graph G;
-	private Set<Edge> E;
-	private Edge e;
-	private Transfer t;
-	private int nrR = 0;
+	private static List<Transfer> T;
+	private static Collection<Integer> S;
+	private static int slicesNeeded;
+	private static PrecomputePathsWithTransmissions getP;
+	private static ArrayList<Path> P;
+	private static Path p;
+	private static Collection<Integer> allSlices;
+	private static List<Edge> E;
+	private static Edge e;
+	private static Transfer t;
+	private static RequestedTransfer reqT;
+	private static int nrR = 0;
 	
 	
-	public void main() throws IOException, URISyntaxException {
-		ReadWithScanner parser = new ReadWithScanner();
-		G = parser.getGraph();
-		P = parser.getTransmissions();
+	public static void main(String[] args) throws IOException, URISyntaxException {
+		TransferCollections transferCollections = new TransferCollections(5);
+        Transfer newTransfer = new Transfer(0,6,4,6);
+        newTransfer.setCurrentAllocation(0,2,2);
+        transferCollections.add_transfer(newTransfer);
+        newTransfer = new Transfer(1,2,3,3);
+        newTransfer.setCurrentAllocation(3,4,2);
+        transferCollections.add_transfer(newTransfer);
+        newTransfer = new Transfer(1,2,3,3);
+        newTransfer.setCurrentAllocation(3,4,2);
+        transferCollections.add_transfer(newTransfer);
+        newTransfer = new Transfer(3,6,2,3);
+        newTransfer.setCurrentAllocation(3, 4, 2);
+        transferCollections.add_transfer(newTransfer);
+        newTransfer = new Transfer(3,6,2,2);
+        newTransfer.setCurrentAllocation(2,3,1);
+        transferCollections.add_transfer(newTransfer);
+        newTransfer = new Transfer(1,6,5,3);
+        newTransfer.setCurrentAllocation(0,1,2);
+        transferCollections.add_transfer(newTransfer);
+        transferCollections.setRequestedTransfer(new RequestedTransfer(0,3,2,3));
+        reqT = transferCollections.getRequestedTransfer();
+        int tempSource = reqT.getNode_origin();
+        int tempDestination = reqT.getNode_destination();
+        String source = "" + tempSource;
+        String destination = "" + tempDestination; 
+        int data = reqT.getData_amount();
+        int timeComp = reqT.getTime_completion();
+        slicesNeeded = (int) Math.ceil(data/timeComp);
+        T = transferCollections.getTransfers();
+        getP.precumputePathsFromTransmission(source, destination);
+		P = getP.getPaths();
 		Iterator<Path> p_it = P.iterator();
-		E = G.getEdges();
 		while(p_it.hasNext()){
 			p = p_it.next();
+			E = p.getEdges();
 			Iterator<Edge> e_it = E.iterator();
 			e = e_it.next();
 			while (e_it.hasNext()) {
