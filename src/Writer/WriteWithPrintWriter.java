@@ -3,6 +3,7 @@ package Writer;
 import dctransfers.PrecomputePathsWithTransmissions;
 import parameters.Edge;
 import parameters.Graph;
+import parameters.NodePair;
 import parameters.Path;
 
 import java.io.File;
@@ -27,7 +28,7 @@ public class WriteWithPrintWriter {
 		this.transmissions = t;
 
         File fileParent= new File(System.getProperty("user.dir"));
-        fFilePath = new File(fileParent,"output.txt").getPath();
+        fFilePath = new File(fileParent,"output_gaby2.txt").getPath();
 		processWriteLineByLine();
 	}
 	
@@ -91,10 +92,11 @@ public class WriteWithPrintWriter {
 			int allPathsSize = allPaths.size();
 			int auxCounter1;
 			int auxCounter2 = 1;
+			String pathLine;
 			
 			writer.write("paths=[\n");
 			
-			for (Path p : allPaths) {				
+			for (Path p : allPaths) {
 				auxCounter1 = 1;
 				
 				writer.write("[");
@@ -126,7 +128,7 @@ public class WriteWithPrintWriter {
 			writer.write("]\n\n");
 
             String requestedTransferStart=new String("a");
-            String requestedTransferEnd=new String("d");
+            String requestedTransferEnd=new String("e");
             ArrayList<Path> pathsForRequestedTransfer = new ArrayList<Path>();
             precomputer.precumputePathsFromTransmission(requestedTransferStart,requestedTransferEnd);
             pathsForRequestedTransfer.addAll(precomputer.getPaths());
@@ -141,6 +143,14 @@ public class WriteWithPrintWriter {
             writer.write("rho_pe=[\n");
 
             for (Path p : pathsForRequestedTransfer) {
+            	pathLine = "";
+				
+				for (NodePair node : p.getPath()) {
+					pathLine += node.getName() + " ";
+				}
+				
+				System.out.println(pathLine);
+            	
                 auxCounter1 = 1;
 
                 writer.write("[");
