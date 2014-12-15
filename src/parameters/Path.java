@@ -1,6 +1,8 @@
 package parameters;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Path {
 	private LinkedList<NodePair> path;
@@ -27,6 +29,19 @@ public class Path {
 		this.cost = cost;
 	}
 	
+	public List<Edge> getEdges() {
+		List<Edge> edges = new ArrayList<Edge>();
+		Edge auxEdge;
+		int pathSize = path.size();
+		
+		for (int i = 1; i <= pathSize; i++) {
+			auxEdge = new Edge(path.get(i-1).getName(), path.get(i).getName());
+			edges.add(auxEdge);
+		}
+		
+		return edges;
+	}
+ 	
 	public boolean hasEdge(Edge e) {
 		boolean hasLink = false;
 		int pathSize = path.size();
