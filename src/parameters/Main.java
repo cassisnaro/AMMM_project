@@ -66,6 +66,7 @@ public class Main {
 										t.validate_reschedule();
 										nrR = nrR + 1;
 										System.out.format("Transfer can be assigned with nr of reschedulings: %d", nrR);
+										break;
 									}
 								}
 							}
