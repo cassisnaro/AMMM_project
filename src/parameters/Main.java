@@ -1,10 +1,14 @@
 package parameters;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.Iterator;
+
+import Reader.ReadWithScanner;
 
 public class Main {
 	//private String source;
@@ -22,8 +26,10 @@ public class Main {
 	private int nrR = 0;
 	
 	
-	public void main(){
-		P = G.getPaths();
+	public void main() throws IOException, URISyntaxException {
+		ReadWithScanner parser = new ReadWithScanner();
+		G = parser.getGraph();
+		P = parser.getTransmissions();
 		Iterator<Path> p_it = P.iterator();
 		E = G.getEdges();
 		while(p_it.hasNext()){
