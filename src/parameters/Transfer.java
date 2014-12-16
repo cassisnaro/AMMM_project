@@ -71,7 +71,7 @@ public class Transfer {
         }
     }
 
-    public Collection<Integer> getFreeSlices(Collection<Integer> freeSlices){
+    public Collection<Integer> getOccupiedSlices(Collection<Integer> freeSlices){
         Collection<Integer> currentFreeSlices = new HashSet<>();
         for(Integer slice:freeSlices){
             if (currentSlices.contains(slice)){
