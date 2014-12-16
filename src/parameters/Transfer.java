@@ -15,6 +15,7 @@ public class Transfer {
     Set<Rectangle> A0;
     Set<Rectangle> A1;
     Set<RectanglePair> feasiblePairs;
+    Path path;
 
     Set<Integer> currentSlices;
     int currentMaxTime;
@@ -196,5 +197,13 @@ public class Transfer {
             return ((a0.getT_end() == a1.getT_start()) && (a1.getMinFreq() <= a0.getMinFreq()) && (a0.getMaxFreq() <= a1.getMaxFreq()) && (a0.getArea() + a1.getArea()) >= data_amount);
         }
     }
+
+	public Path getPath() {
+		return path;
+	}
+
+	public void setPath(Path path) {
+		this.path = path;
+	}
 
 }

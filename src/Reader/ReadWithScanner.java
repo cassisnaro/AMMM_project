@@ -1,5 +1,6 @@
 package Reader;
 
+import parameters.Edge;
 import parameters.Graph;
 import parameters.NodePair;
 import parameters.Path;
@@ -14,14 +15,16 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class ReadWithScanner {
 	
 	private final File fFilePath;
 	private final Charset ENCODING = StandardCharsets.UTF_8; 
 	private Graph graph = new Graph();
-	private ArrayList<Path> transmissions = new ArrayList<Path>();
+//	private ArrayList<Path> transmissions = new ArrayList<Path>();
 	private RequestedTransfer requestedTransfer;
 	private int numSlices;
 	private TransferCollections transferCollections;
@@ -40,12 +43,12 @@ public class ReadWithScanner {
 		return graph;
 	}
 	
-	public ArrayList<Path> getTransmissions() {
-		return transmissions;
-	}
-	
 	public RequestedTransfer getRequestedTransfer() {
 		return requestedTransfer;
+	}
+	
+	public TransferCollections getTransferCollections() {
+		return transferCollections;
 	}
 
 	public void processReadLineByLine() throws IOException {
@@ -57,6 +60,17 @@ public class ReadWithScanner {
 				lineIdentifier = scanner.nextLine();
 				line = scanner.nextLine();
 				processReadLine(lineIdentifier, line);
+			}
+			
+			List<Transfer> transfers = transferCollections.getTransfers();
+			Set<Edge> edges = graph.getEdges();
+			
+			for (Edge edge : edges) {
+				for (Transfer transfer : transfers) {
+					if (transfer.getPath().hasEdge(edge)) {
+						edge.addTransfer(transfer);
+					}
+				}
 			}
 			
 			scanner.close();
@@ -121,8 +135,6 @@ public class ReadWithScanner {
 				separatorIndex++;
 			}
 			
-			transmissions.add(new Path(transmissionPath, 0));
-			
 			auxNodeOrigin = graph.getNodeIdentifier(transmissionPath.get(0).getName());
 			auxNodeDestination = graph.getNodeIdentifier(transmissionPath.get(transmissionPath.size() - 1).getName());
 			auxTimeCompletion = Integer.parseInt(data[separatorIndex + 1]);
@@ -133,6 +145,7 @@ public class ReadWithScanner {
 			
 			auxTransfer = new Transfer(auxNodeOrigin, auxNodeDestination, auxTimeCompletion, auxDataAmount);
 			auxTransfer.setCurrentAllocation(auxMinCurrentSlices, auxMaxCurrentSlices, auxCurrentMaxTime);
+			auxTransfer.setPath(new Path(transmissionPath, 0));
 			
 			transferCollections.add_transfer(auxTransfer);
 		}

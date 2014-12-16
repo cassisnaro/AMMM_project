@@ -6,6 +6,8 @@ import parameters.Graph;
 import parameters.NodePair;
 import parameters.Path;
 import parameters.RequestedTransfer;
+import parameters.Transfer;
+import parameters.TransferCollections;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,12 +24,12 @@ public class WriteWithPrintWriter {
 	private final String fFilePath;
 	private final Charset ENCODING = StandardCharsets.UTF_8;
 	private Graph graph;
-	private ArrayList<Path> transmissions;
+	private TransferCollections transferCollections;
 	private RequestedTransfer requestedTransfer;
 	
-	public WriteWithPrintWriter(Graph g, ArrayList<Path> t, RequestedTransfer rt) throws URISyntaxException, IOException {
+	public WriteWithPrintWriter(Graph g, TransferCollections tc, RequestedTransfer rt) throws URISyntaxException, IOException {
 		this.graph = g;
-		this.transmissions = t;
+		this.transferCollections = tc;
 		this.requestedTransfer = rt;
 
         File fileParent= new File(System.getProperty("user.dir"));
@@ -189,13 +191,15 @@ public class WriteWithPrintWriter {
 			
 			writer.write("rho_re=[\n");
 			
-			for (Path t : transmissions) {				
+			List<Transfer> transfers = transferCollections.getTransfers();
+			
+			for (Transfer t : transfers) {				
 				auxCounter1 = 1;
 				
 				writer.write("[");
 				
 				for (Edge e : edges) {
-					if (t.hasEdge(e)) {
+					if (t.getPath().hasEdge(e)) {
 						writer.write("1");
 					}
 					else {

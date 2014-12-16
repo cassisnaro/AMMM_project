@@ -1,5 +1,6 @@
 package parameters;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ public class Edge {
 	public Edge(String s, String d) {
 		this.source = s;
 		this.destination = d;
+		this.transfers = new ArrayList<Transfer>();
 	}
 
 	public static boolean containsPair(List<Edge> edges, Edge e) {
@@ -72,5 +74,9 @@ public class Edge {
 		}
 		
 		return equal;
+	}
+	
+	public void addTransfer(Transfer t) {
+		this.transfers.add(t);
 	}
 }
