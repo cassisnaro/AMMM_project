@@ -1,13 +1,14 @@
 package parameters;
 
 import Reader.ReadWithScanner;
+import dctransfers.PrecomputePathsWithTransmissions;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Iterator;
-import dctransfers.PrecomputePathsWithTransmissions;
+import java.util.List;
 
 public class Main {
 	private static List<Transfer> T;
@@ -30,15 +31,13 @@ public class Main {
 		ReadWithScanner parser = new ReadWithScanner();
 		System.out.println("Parser started.");
 		reqT = parser.getRequestedTransfer();
-        int tempSource = reqT.getNode_origin();
-        int tempDestination = reqT.getNode_destination();
-        String source = "" + tempSource;
-        String destination = "" + tempDestination; 
+        String source = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_origin());
+        String destination = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_destination());
         int data = reqT.getData_amount();
         int timeComp = reqT.getTime_completion();
         double tempSlices = Math.ceil(data/timeComp);
         slicesNeeded = (int) tempSlices; /// slicesNeeded = 1 for data 5 and time 3 why?
-        System.out.format("Requested Transfer: s: %d, d: %d, data: %d, time: %d, slicesNeeded: %d\n", tempSource, tempDestination, data, timeComp, slicesNeeded);
+        System.out.format("Requested Transfer: s: %s, d: %s, data: %d, time: %d, slicesNeeded: %d\n", source, destination, data, timeComp, slicesNeeded);
         numSlices = parser.getNumSlices();
         for (int j=0; j<=numSlices; j++){
         	allSlices.add(j);
