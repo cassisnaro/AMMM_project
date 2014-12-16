@@ -5,10 +5,7 @@ import dctransfers.PrecomputePathsWithTransmissions;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 	private static List<Transfer> T;
@@ -19,12 +16,13 @@ public class Main {
 	private static Path p;
 	private static int numSlices;
 	private static Collection<Integer> allSlices = new ArrayList<Integer>();
-	private static List<Edge> E;
+	private static Set<Edge> E;
 	private static Graph G;
 	private static Edge e;
 	private static Transfer t;
 	private static RequestedTransfer reqT;
 	private static int nrR = 0;
+	private static TransferCollections transferCollections;
 	
 	
 	public static void main(String[] args) throws IOException, URISyntaxException {
@@ -41,6 +39,8 @@ public class Main {
         for (int j=0; j<=numSlices; j++){
         	allSlices.add(j);
         }
+        transferCollections = parser.getTransferCollections();
+        T = transferCollections.getTransfers();
         G = parser.getGraph();
         getP = new PrecomputePathsWithTransmissions(G);
         getP.precumputePathsFromTransmission(source, destination);
@@ -48,7 +48,7 @@ public class Main {
 		Iterator<Path> p_it = P.iterator();
 		while(p_it.hasNext()){
 			p = p_it.next();
-			E = p.getEdges();
+			E = G.getEdges();
 			Iterator<Edge> e_it = E.iterator();
 			e = e_it.next();
 			while (e_it.hasNext()) {
@@ -70,7 +70,7 @@ public class Main {
 						}
 					}
 					if(temp_slicesNeeded == 0){
-						System.out.format("Transfer can be assigned with nr of reschedulings: %d", nrR);
+						System.out.format("Transfer can be assigned with nr of reschedulings: %d\n", nrR);
 					} else {
 						while(temp_slicesNeeded>0){
 							s_it.hasNext();
@@ -80,14 +80,13 @@ public class Main {
 								temp_s = s1;
 							} else {
 								int pos = temp_s.intValue();
-								T = e.getTransfers();
 								for (int i = 0; i < T.size(); i++) {
 									t = T.get(i);
 									int slicesFree = t.maximize_free_room(pos, true);
 									if(slicesFree == temp_slicesNeeded){
 										t.validate_reschedule();
 										nrR = nrR + 1;
-										System.out.format("Transfer can be assigned with nr of reschedulings: %d", nrR);
+										System.out.format("Transfer can be assigned with nr of reschedulings: %d\n", nrR);
 										break;
 									}
 								}
@@ -95,6 +94,7 @@ public class Main {
 						}
 					}
 				}
+                e_it.next();
 			}
 		}
 	}
