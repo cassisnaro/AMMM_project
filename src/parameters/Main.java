@@ -5,10 +5,7 @@ import dctransfers.PrecomputePathsWithTransmissions;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 	private static List<Transfer> T;
@@ -19,7 +16,7 @@ public class Main {
 	private static Path p;
 	private static int numSlices;
 	private static Collection<Integer> allSlices = new ArrayList<Integer>();
-	private static List<Edge> E;
+	private static Set<Edge> E;
 	private static Graph G;
 	private static Edge e;
 	private static Transfer t;
@@ -51,7 +48,7 @@ public class Main {
 		Iterator<Path> p_it = P.iterator();
 		while(p_it.hasNext()){
 			p = p_it.next();
-			E = p.getEdges();
+			E = G.getEdges();
 			Iterator<Edge> e_it = E.iterator();
 			e = e_it.next();
 			while (e_it.hasNext()) {
@@ -97,6 +94,7 @@ public class Main {
 						}
 					}
 				}
+                e_it.next();
 			}
 		}
 	}
