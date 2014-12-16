@@ -36,7 +36,7 @@ public class Main {
         slicesNeeded = (int) Math.ceil((double)data/(double)timeComp);
         System.out.format("Requested Transfer: s: %s, d: %s, data: %d, time: %d, slicesNeeded: %d\n", source, destination, data, timeComp, slicesNeeded);
         numSlices = parser.getNumSlices();
-        for (int j=0; j<=numSlices; j++){
+        for (int j=0; j<numSlices; j++){
         	allSlices.add(j);
         }
         transferCollections = parser.getTransferCollections();
