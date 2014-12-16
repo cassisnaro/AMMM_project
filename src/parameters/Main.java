@@ -53,7 +53,7 @@ public class Main {
 			e = e_it.next();
 			while (e_it.hasNext()) {
 				if (p.hasEdge(e)){
-					S = e.getFreeSlices(allSlices);
+					S = e.getOccupiedSlices(allSlices);
 					Iterator<Integer> s_it = S.iterator();
 					s_it.hasNext();
 					Integer temp_s = s_it.next();

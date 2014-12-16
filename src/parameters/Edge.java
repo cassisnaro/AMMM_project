@@ -56,11 +56,11 @@ public class Edge {
 		this.transfers = transmissions;
 	}
 
-	public Collection<Integer> getFreeSlices(Collection<Integer> allSlices) {
+	public Collection<Integer> getOccupiedSlices(Collection<Integer> allSlices) {
 		Collection<Integer> freeSlices = new HashSet<Integer>(allSlices);
 
 		for (Transfer t : transfers) {
-			freeSlices.removeAll(t.getFreeSlices(freeSlices));
+			freeSlices.removeAll(t.getOccupiedSlices(freeSlices));
 		}
 
 		return freeSlices;
