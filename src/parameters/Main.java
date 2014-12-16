@@ -28,6 +28,7 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException, URISyntaxException {
 		ReadWithScanner parser = new ReadWithScanner();
+		System.out.println("Parser started.");
 		reqT = parser.getRequestedTransfer();
         int tempSource = reqT.getNode_origin();
         int tempDestination = reqT.getNode_destination();
@@ -35,13 +36,15 @@ public class Main {
         String destination = "" + tempDestination; 
         int data = reqT.getData_amount();
         int timeComp = reqT.getTime_completion();
-        slicesNeeded = (int) Math.ceil(data/timeComp);
+        double tempSlices = Math.ceil(data/timeComp);
+        slicesNeeded = (int) tempSlices; /// slicesNeeded = 1 for data 5 and time 3 why?
+        System.out.format("Requested Transfer: s: %d, d: %d, data: %d, time: %d, slicesNeeded: %d\n", tempSource, tempDestination, data, timeComp, slicesNeeded);
         numSlices = parser.getNumSlices();
         for (int j=0; j<=numSlices; j++){
         	allSlices.add(j);
         }
         G = parser.getGraph();
-        getP.PrecomputePathsWithTransmissions(G);
+        getP = new PrecomputePathsWithTransmissions(G);
         getP.precumputePathsFromTransmission(source, destination);
 		P = getP.getPaths();
 		Iterator<Path> p_it = P.iterator();
@@ -98,4 +101,3 @@ public class Main {
 		}
 	}
 }
-
