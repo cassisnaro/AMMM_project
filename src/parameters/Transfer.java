@@ -82,7 +82,7 @@ public class Transfer {
 
     public int maximize_free_room(int pos, boolean toTheRight){
         tmpSlices = new LinkedHashSet<>(currentSlices);
-        int min_slices=(int) Math.ceil(data_amount/time_completion);
+        int min_slices=(int) Math.ceil((double)data_amount/(double)time_completion);
         if (min_slices>=currentSlices.size()){
             return 0;
         }

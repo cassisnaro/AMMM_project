@@ -35,8 +35,7 @@ public class Main {
         String destination = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_destination());
         int data = reqT.getData_amount();
         int timeComp = reqT.getTime_completion();
-        double tempSlices = Math.ceil(data/timeComp);
-        slicesNeeded = (int) tempSlices; /// slicesNeeded = 1 for data 5 and time 3 why?
+        slicesNeeded = (int) Math.ceil((double)data/(double)timeComp);
         System.out.format("Requested Transfer: s: %s, d: %s, data: %d, time: %d, slicesNeeded: %d\n", source, destination, data, timeComp, slicesNeeded);
         numSlices = parser.getNumSlices();
         for (int j=0; j<=numSlices; j++){
