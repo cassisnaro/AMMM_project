@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Iterator;
-
-import Reader.ReadWithScanner;
-//import Reader.ReadWithScanner;
 import dctransfers.PrecomputePathsWithTransmissions;
 
 public class Main {
@@ -19,8 +16,10 @@ public class Main {
 	private static PrecomputePathsWithTransmissions getP;
 	private static ArrayList<Path> P;
 	private static Path p;
-	private static Collection<Integer> allSlices;
+	private static int numSlices;
+	private static Collection<Integer> allSlices = new ArrayList<Integer>();
 	private static List<Edge> E;
+	private static Graph G;
 	private static Edge e;
 	private static Transfer t;
 	private static RequestedTransfer reqT;
@@ -37,6 +36,12 @@ public class Main {
         int data = reqT.getData_amount();
         int timeComp = reqT.getTime_completion();
         slicesNeeded = (int) Math.ceil(data/timeComp);
+        numSlices = parser.getNumSlices();
+        for (int j=0; j<=numSlices; j++){
+        	allSlices.add(j);
+        }
+        G = parser.getGraph();
+        getP.PrecomputePathsWithTransmissions(G);
         getP.precumputePathsFromTransmission(source, destination);
 		P = getP.getPaths();
 		Iterator<Path> p_it = P.iterator();
@@ -93,3 +98,4 @@ public class Main {
 		}
 	}
 }
+
