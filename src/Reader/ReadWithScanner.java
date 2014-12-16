@@ -40,6 +40,10 @@ public class ReadWithScanner {
 		return graph;
 	}
 	
+	public int getNumSlices(){
+		return numSlices;
+	}
+	
 	public ArrayList<Path> getTransmissions() {
 		return transmissions;
 	}
@@ -143,4 +147,3 @@ public class ReadWithScanner {
 		}
 	}
 }
-
