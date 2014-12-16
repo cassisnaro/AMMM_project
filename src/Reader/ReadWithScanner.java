@@ -43,6 +43,10 @@ public class ReadWithScanner {
 		return graph;
 	}
 	
+	public int getNumSlices(){
+		return numSlices;
+	}
+	
 	public RequestedTransfer getRequestedTransfer() {
 		return requestedTransfer;
 	}
@@ -156,4 +160,3 @@ public class ReadWithScanner {
 		}
 	}
 }
-

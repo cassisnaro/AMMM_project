@@ -1,16 +1,14 @@
 package parameters;
 
 import Reader.ReadWithScanner;
+import dctransfers.PrecomputePathsWithTransmissions;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Iterator;
-
-import Reader.ReadWithScanner;
-//import Reader.ReadWithScanner;
-import dctransfers.PrecomputePathsWithTransmissions;
+import java.util.List;
 
 public class Main {
 	private static List<Transfer> T;
@@ -19,8 +17,10 @@ public class Main {
 	private static PrecomputePathsWithTransmissions getP;
 	private static ArrayList<Path> P;
 	private static Path p;
-	private static Collection<Integer> allSlices;
+	private static int numSlices;
+	private static Collection<Integer> allSlices = new ArrayList<Integer>();
 	private static List<Edge> E;
+	private static Graph G;
 	private static Edge e;
 	private static Transfer t;
 	private static RequestedTransfer reqT;
@@ -29,14 +29,20 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException, URISyntaxException {
 		ReadWithScanner parser = new ReadWithScanner();
+		System.out.println("Parser started.");
 		reqT = parser.getRequestedTransfer();
-        int tempSource = reqT.getNode_origin();
-        int tempDestination = reqT.getNode_destination();
-        String source = "" + tempSource;
-        String destination = "" + tempDestination; 
+        String source = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_origin());
+        String destination = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_destination());
         int data = reqT.getData_amount();
         int timeComp = reqT.getTime_completion();
-        slicesNeeded = (int) Math.ceil(data/timeComp);
+        slicesNeeded = (int) Math.ceil((double)data/(double)timeComp);
+        System.out.format("Requested Transfer: s: %s, d: %s, data: %d, time: %d, slicesNeeded: %d\n", source, destination, data, timeComp, slicesNeeded);
+        numSlices = parser.getNumSlices();
+        for (int j=0; j<=numSlices; j++){
+        	allSlices.add(j);
+        }
+        G = parser.getGraph();
+        getP = new PrecomputePathsWithTransmissions(G);
         getP.precumputePathsFromTransmission(source, destination);
 		P = getP.getPaths();
 		Iterator<Path> p_it = P.iterator();

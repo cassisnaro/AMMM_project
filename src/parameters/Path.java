@@ -34,7 +34,7 @@ public class Path {
 		Edge auxEdge;
 		int pathSize = path.size();
 		
-		for (int i = 1; i <= pathSize; i++) {
+		for (int i = 1; i < pathSize; i++) {
 			auxEdge = new Edge(path.get(i-1).getName(), path.get(i).getName());
 			edges.add(auxEdge);
 		}
