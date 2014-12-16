@@ -25,6 +25,7 @@ public class Main {
 	private static Transfer t;
 	private static RequestedTransfer reqT;
 	private static int nrR = 0;
+	private static TransferCollections transferCollections;
 	
 	
 	public static void main(String[] args) throws IOException, URISyntaxException {
@@ -41,6 +42,8 @@ public class Main {
         for (int j=0; j<=numSlices; j++){
         	allSlices.add(j);
         }
+        transferCollections = parser.getTransferCollections();
+        T = transferCollections.getTransfers();
         G = parser.getGraph();
         getP = new PrecomputePathsWithTransmissions(G);
         getP.precumputePathsFromTransmission(source, destination);
@@ -70,7 +73,7 @@ public class Main {
 						}
 					}
 					if(temp_slicesNeeded == 0){
-						System.out.format("Transfer can be assigned with nr of reschedulings: %d", nrR);
+						System.out.format("Transfer can be assigned with nr of reschedulings: %d\n", nrR);
 					} else {
 						while(temp_slicesNeeded>0){
 							s_it.hasNext();
@@ -80,14 +83,13 @@ public class Main {
 								temp_s = s1;
 							} else {
 								int pos = temp_s.intValue();
-								T = e.getTransfers();
 								for (int i = 0; i < T.size(); i++) {
 									t = T.get(i);
 									int slicesFree = t.maximize_free_room(pos, true);
 									if(slicesFree == temp_slicesNeeded){
 										t.validate_reschedule();
 										nrR = nrR + 1;
-										System.out.format("Transfer can be assigned with nr of reschedulings: %d", nrR);
+										System.out.format("Transfer can be assigned with nr of reschedulings: %d\n", nrR);
 										break;
 									}
 								}
