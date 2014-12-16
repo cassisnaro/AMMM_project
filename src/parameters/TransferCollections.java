@@ -24,13 +24,13 @@ public class TransferCollections {
         maxA1=-1;
     }
 
+    public RequestedTransfer getRequestedTransfer() {
+        return requestedTransfer;
+    }
+    
     public void setRequestedTransfer(RequestedTransfer requestedTransfer) {
         this.requestedTransfer = requestedTransfer;
         requestedTransfer.computeRectanglesSet(maxFreq);
-    }
-    
-    public RequestedTransfer getRequestedTransfer() {
-        return requestedTransfer;
     }
     
     public List<Transfer> getTransfers() {
@@ -68,7 +68,6 @@ public class TransferCollections {
         A0s.clear();
         A0s.addAll(requestedTransfer.getA());
         for(Rectangle rectangle:A0s){
-            System.out.println("freq size: " + rectangle.getFrequencySlices().size() + " t0=" + rectangle.getT_start() + " t1=" + rectangle.getT_end());
             printStream.print("[");
             for(int freq=0; freq<maxFreq; freq++){
                 if (freq!=0){
@@ -329,11 +328,6 @@ public class TransferCollections {
             }
             for (int extraRectangleA0 = A0s.size(); extraRectangleA0 < maxA0; extraRectangleA0++) {
                 printStream.print(", 0");
-            }
-            if (found){
-                System.out.println("OK");
-            }else{
-                System.out.println("Problem");
             }
             printStream.print("]");
         }
