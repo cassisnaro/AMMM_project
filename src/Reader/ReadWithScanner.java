@@ -1,19 +1,12 @@
 package Reader;
 
-import parameters.Edge;
-import parameters.Graph;
-import parameters.NodePair;
-import parameters.Path;
-import parameters.RequestedTransfer;
-import parameters.Transfer;
-import parameters.TransferCollections;
+import parameters.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -31,7 +24,7 @@ public class ReadWithScanner {
 
 	public ReadWithScanner() throws URISyntaxException, IOException {
         File fileParent= new File(System.getProperty("user.dir"));
-		fFilePath = new File(fileParent,"input_gaby_v1.txt");
+		fFilePath = new File(fileParent,"inputTestHard.txt");
 		processReadLineByLine();
 	}
 	

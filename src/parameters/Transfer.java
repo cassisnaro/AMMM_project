@@ -12,19 +12,22 @@ public class Transfer {
     int time_completion;
     int data_amount;
     Set<Integer> tmpSlices;
+    Set<Integer> tmpSlices2;
     Set<Rectangle> A0;
     Set<Rectangle> A1;
     Set<RectanglePair> feasiblePairs;
     Path path;
-
     Set<Integer> currentSlices;
     int currentMaxTime;
-
     public Transfer(int node_origin, int node_destination, int time_completion, int data_amount) {
         this.node_origin = node_origin;
         this.node_destination = node_destination;
         this.time_completion = time_completion;
         this.data_amount = data_amount;
+    }
+
+    public Set<Integer> getCurrentSlices() {
+        return currentSlices;
     }
 
     public void setCurrentAllocation(int minCurrentSlices, int maxCurrentSlices, int currentMaxTime){
@@ -70,6 +73,16 @@ public class Transfer {
             tmpSlices.add(new Integer(i));
         }
     }
+    public void setTemporarySlices2(int from, int to){
+        if (tmpSlices2==null){
+            tmpSlices2=new LinkedHashSet<>();
+        } else {
+            tmpSlices2.clear();
+        }
+        for(int i=from; i<=to; i++){
+            tmpSlices2.add(new Integer(i));
+        }
+    }
 
     public Collection<Integer> getOccupiedSlices(Collection<Integer> freeSlices){
         Collection<Integer> currentFreeSlices = new HashSet<>();
@@ -79,6 +92,96 @@ public class Transfer {
             }
         }
         return currentFreeSlices;
+    }
+
+    public boolean usesSlice(int slice){
+        return currentSlices.contains(new Integer(slice));
+    }
+
+    public Collection<Integer> maximize_free_room(int minPos, int maxPos, int extraSlicesNeeded){
+        Set<Integer> impossibleSlices=new HashSet<>();
+        int min_slices=(int) Math.ceil((double)data_amount/(double)time_completion);
+        if (min_slices>=currentSlices.size()){
+            tmpSlices=currentSlices;
+            impossibleSlices.addAll(currentSlices);
+            return impossibleSlices;
+        }
+        int spaceAbleToFree=currentSlices.size()-min_slices;
+        int first_slice=(int)currentSlices.toArray()[0];
+        int last_slice=(int)currentSlices.toArray()[currentSlices.size()-1];
+        boolean toTheRight=true;
+        if(last_slice<minPos) toTheRight=false;
+        if(toTheRight){
+            if(maxPos+extraSlicesNeeded>=first_slice) {
+                setTemporarySlices(first_slice + spaceAbleToFree, last_slice);
+                for (int slicei = first_slice + spaceAbleToFree; slicei <= last_slice; slicei++) {
+                    impossibleSlices.add(new Integer(slicei));
+                }
+            }
+        } else {
+            if (minPos-extraSlicesNeeded<=last_slice) {
+                setTemporarySlices(first_slice, first_slice + min_slices - 1);
+                for (int slicei = first_slice; slicei <= first_slice + min_slices - 1; slicei++) {
+                    impossibleSlices.add(new Integer(slicei));
+                }
+            }
+        }
+        return impossibleSlices;
+
+    }
+
+    public Collection<Integer> maximize_free_room(int pos, int extraSlicesNeeded){
+        Set<Integer> impossibleSlices=new HashSet<>();
+        int min_slices=(int) Math.ceil((double)data_amount/(double)time_completion);
+        if (min_slices>=currentSlices.size()){
+            tmpSlices=currentSlices;
+            impossibleSlices.addAll(currentSlices);
+            return impossibleSlices;
+        }
+        int spaceAbleToFree=currentSlices.size()-min_slices;
+        int first_slice=(int)currentSlices.toArray()[0];
+        int last_slice=(int)currentSlices.toArray()[currentSlices.size()-1];
+
+        if(pos==first_slice-1){
+            setTemporarySlices(first_slice + spaceAbleToFree, last_slice);
+            for (int slicei = first_slice + spaceAbleToFree; slicei <= last_slice; slicei++) {
+                impossibleSlices.add(new Integer(slicei));
+            }
+        } else if(pos==last_slice){
+            setTemporarySlices(first_slice, first_slice + min_slices - 1);
+            for (int slicei = first_slice; slicei <= first_slice + min_slices - 1; slicei++) {
+                impossibleSlices.add(new Integer(slicei));
+            }
+        }
+        return impossibleSlices;
+
+    }
+
+    public ReschedulePair freeSlicesWithinTransfer(int minPos, int maxPos){
+        int first_slice=(int)currentSlices.toArray()[0];
+        int last_slice=(int)currentSlices.toArray()[currentSlices.size()-1];
+
+        if(first_slice<=minPos && maxPos<=last_slice){
+            int min_slices=(int) Math.ceil((double)data_amount/(double)time_completion);
+            if (last_slice-first_slice>=min_slices){
+                /*We can squeeze everything to the right of the requested slices*/
+                setTemporarySlices(maxPos+1,last_slice);
+            }else{
+                /*Was not possible*/
+                setTemporarySlices(first_slice,last_slice);
+            }
+            if (minPos-first_slice>=min_slices){
+                /*We can squeeze everything to the left of the requested slices*/
+                setTemporarySlices(first_slice,minPos-1);
+            }else{
+                /*Was not possible*/
+                setTemporarySlices(first_slice,last_slice);
+            }
+        }else{
+            setTemporarySlices(first_slice,last_slice);
+            setTemporarySlices2(first_slice,last_slice);
+        }
+        return new ReschedulePair(tmpSlices,tmpSlices2);
     }
 
     public int maximize_free_room(int pos, boolean toTheRight){
@@ -124,6 +227,21 @@ public class Transfer {
             System.out.print(slice+" ");
         }
         System.out.println();
+    }
+
+    public void print_tmpslices2(){
+        System.out.print("\t");
+        for(Integer slice: tmpSlices2){
+            System.out.print(slice+" ");
+        }
+        System.out.println();
+    }
+
+    public int getFirstSlice(){
+        return (int)currentSlices.toArray()[0];
+    }
+    public int getLastSlice(){
+        return (int)currentSlices.toArray()[currentSlices.size()-1];
     }
 
     public int getTime_completion() {

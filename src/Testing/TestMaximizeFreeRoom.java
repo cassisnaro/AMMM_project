@@ -8,7 +8,7 @@ import parameters.Transfer;
 public class TestMaximizeFreeRoom {
     public static void main(String... aArgs){
         int test_time_completion=10;
-        int test_data=20;
+        int test_data=21;
         int test_min_slice=2;
         int test_max_slice=6;
         Transfer transfer=new Transfer(1,2,test_time_completion,test_data);
@@ -28,6 +28,12 @@ public class TestMaximizeFreeRoom {
         test_1(transfer,pos);
         pos=7;
         test_1(transfer,pos);
+
+        /*System.out.println("Method v2:");
+        System.out.println("places to free to the right"+transfer.maximize_free_room(true));
+        transfer.print_tmpslices();
+        System.out.println("places to free to the left"+transfer.maximize_free_room(false));
+        transfer.print_tmpslices();*/
     }
     private static void test_1(Transfer transfer, int pos){
         System.out.println("Space we can make free at the left of position "+pos+": "+transfer.maximize_free_room(pos,false));

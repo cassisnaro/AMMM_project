@@ -8,94 +8,236 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 public class Main {
-	private static List<Transfer> T;
-	private static Collection<Integer> S;
-	private static int slicesNeeded;
-	private static PrecomputePathsWithTransmissions getP;
-	private static ArrayList<Path> P;
-	private static Path p;
-	private static int numSlices;
-	private static Collection<Integer> allSlices = new ArrayList<Integer>();
-	private static Set<Edge> E;
-	private static Graph G;
-	private static Edge e;
-	private static Transfer t;
-	private static RequestedTransfer reqT;
-	private static int nrR = 0;
-	private static TransferCollections transferCollections;
-	
-	
-	public static void main(String[] args) throws IOException, URISyntaxException {
-		ReadWithScanner parser = new ReadWithScanner();
-		System.out.println("Parser started.");
-		reqT = parser.getRequestedTransfer();
+    private static List<Transfer> T;
+    private static int slicesNeeded;
+    private static PrecomputePathsWithTransmissions getP;
+    private static ArrayList<Path> P;
+    private static int numSlices;
+    private static Collection<Integer> allSlices = new ArrayList<Integer>();
+    private static Set<Edge> E;
+    private static Graph G;
+    private static Edge e;
+    private static Transfer t;
+    private static RequestedTransfer reqT;
+    private static int nrR = 0;
+    private static TransferCollections transferCollections;
+
+
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        ReadWithScanner parser = new ReadWithScanner();
+        System.out.println("Parser started.");
+        reqT = parser.getRequestedTransfer();
         String source = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_origin());
         String destination = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_destination());
         int data = reqT.getData_amount();
         int timeComp = reqT.getTime_completion();
-        slicesNeeded = (int) Math.ceil((double)data/(double)timeComp);
+        slicesNeeded = (int) Math.ceil((double) data / (double) timeComp);
         System.out.format("Requested Transfer: s: %s, d: %s, data: %d, time: %d, slicesNeeded: %d\n", source, destination, data, timeComp, slicesNeeded);
         numSlices = parser.getNumSlices();
-        for (int j=0; j<numSlices; j++){
-        	allSlices.add(j);
+        for (int j = 0; j < numSlices; j++) {
+            allSlices.add(j);
         }
         transferCollections = parser.getTransferCollections();
         T = transferCollections.getTransfers();
         G = parser.getGraph();
         getP = new PrecomputePathsWithTransmissions(G);
         getP.precumputePathsFromTransmission(source, destination);
-		P = getP.getPaths();
-		Iterator<Path> p_it = P.iterator();
-		while(p_it.hasNext()){
-			p = p_it.next();
-			E = G.getEdges();
-			Iterator<Edge> e_it = E.iterator();
-			e = e_it.next();
-			while (e_it.hasNext()) {
-				if (p.hasEdge(e)){
-					S = e.getOccupiedSlices(allSlices);
-					Iterator<Integer> s_it = S.iterator();
-					s_it.hasNext();
-					Integer temp_s = s_it.next();
-					Integer temp_slicesNeeded = slicesNeeded;
-					while(temp_slicesNeeded>0){
-						s_it.hasNext();
-						Integer s1 = s_it.next();
-						if(s1 == temp_s+1){
-							temp_slicesNeeded = temp_slicesNeeded-1;
-							temp_s = s1;
-						} else {
-							temp_slicesNeeded = slicesNeeded;
-							temp_s = s1;
-						}
-					}
-					if(temp_slicesNeeded == 0){
-						System.out.format("Transfer can be assigned with nr of reschedulings: %d\n", nrR);
-					} else {
-						while(temp_slicesNeeded>0){
-							s_it.hasNext();
-							Integer s1 = s_it.next();
-							if(s1 == temp_s+1){
-								temp_slicesNeeded = temp_slicesNeeded-1;
-								temp_s = s1;
-							} else {
-								int pos = temp_s.intValue();
-								for (int i = 0; i < T.size(); i++) {
-									t = T.get(i);
-									int slicesFree = t.maximize_free_room(pos, true);
-									if(slicesFree == temp_slicesNeeded){
-										t.validate_reschedule();
-										nrR = nrR + 1;
-										System.out.format("Transfer can be assigned with nr of reschedulings: %d\n", nrR);
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-                e_it.next();
-			}
-		}
-	}
+        P = getP.getPaths();
+
+        Path reroutingPath=null;
+        for (Path p : P) {
+            E = G.getEdges();
+            Collection<Integer> S = allSlices;
+            for (Edge e : E) {
+                if (p.hasEdge(e)) {
+                    S = e.getFreeSlices(S);
+                    System.out.println(e.getSource() + " " + e.getDestination());
+                }
+            }
+            int maxContinous = maxContinuity(S);
+            if (maxContinous>=slicesNeeded){
+                System.out.println("can be route over this path without rescheduling");
+                reroutingPath=p;
+                break;
+            }
+        }
+        if(reroutingPath==null){
+            System.out.println("trivial case failed");
+            for (Path p : P) {
+                E = G.getEdges();
+                Collection<Integer>S = allSlices;
+                for (Edge e : E) {
+                    if (p.hasEdge(e)) {
+                        S = e.getFreeSlices(S);
+                        System.out.println(e.getSource() + " " + e.getDestination());
+                    }
+                }
+                int firstSliceCurrentFreeSpace=-1;
+                int previousSlice=-1;
+                for(Integer slice:S){
+                    if(firstSliceCurrentFreeSpace==-1){
+                        firstSliceCurrentFreeSpace=slice;
+                        previousSlice=slice;
+                    }else{
+                        if(previousSlice+1==slice){
+                            previousSlice=slice;
+                        }else{
+                            boolean reschedulePossible= halfHardReschedulePossible(p, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded);
+                            if (reschedulePossible){
+                                System.out.println("one path found");
+                                break;
+                            }
+                            firstSliceCurrentFreeSpace=slice;
+                            previousSlice=slice;
+                        }
+                    }
+                }
+                /*Test with the last free range of the list*/
+                if(previousSlice!=-1) {
+                    boolean reschedulePossible = halfHardReschedulePossible(p, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded);
+                    if (reschedulePossible) {
+                        System.out.println("one path found, half hard");
+                        reroutingPath = p;
+                        break;
+                    }
+                }
+            }
+        }
+        if(reroutingPath==null){
+            System.out.println("Half hard failed");
+            for (Path p : P) {
+                boolean reschedulePossible =hardReschedulePossible(p, slicesNeeded);
+                if (reschedulePossible) {
+                    System.out.println("one path found, half hard");
+                    reroutingPath = p;
+                    break;
+                }
+            }
+        }
+    }
+
+    static private boolean halfHardReschedulePossible(Path path, int firstSlice, int lastSlice, int minBitRate){
+        int extraSlicesNeeded=minBitRate-(lastSlice-firstSlice);
+        E = G.getEdges();
+        Set<Integer> impossibleSlicesForPath=new HashSet<>();
+        for (Edge e : E) {
+            if (path.hasEdge(e)) {
+                System.out.println("Looking at edge: "+e.getSource()+"-"+e.getDestination());
+                Collection<Integer> impossibleSlicesForEdge=e.increaseRoom(firstSlice, lastSlice, extraSlicesNeeded);
+                System.out.print("impossible slices for path: ");
+                impossibleSlicesForPath.addAll(impossibleSlicesForEdge);
+                for(Integer slice:impossibleSlicesForPath){
+                    System.out.print(slice+" ");
+                }
+                System.out.println();
+            }
+        }
+        Collection<Integer> availableSlices=allSlices;
+        availableSlices.removeAll(impossibleSlicesForPath);
+        for(Integer slice:availableSlices){
+            System.out.print(slice+" ");
+        }
+        System.out.println();
+        int maxContinuity=maxContinuity(availableSlices);
+        return (maxContinuity>=minBitRate);
+    }
+
+    static private boolean hardReschedulePossible(Path path, int minBitRate){
+        E = G.getEdges();
+//        Set<Integer> impossibleSlicesForPath=new HashSet<>();
+        List<Collection<Integer>> availableSlicesSegments= new LinkedList<>();
+        List<Collection<Integer>> availableTransmissionLimits= new LinkedList<>();
+
+
+        for (Edge e : E) {
+            if (path.hasEdge(e)) {
+                Collection<Integer> S = allSlices;
+                S = e.getFreeSlices(S);
+                availableSlicesSegments.add(S);
+                availableTransmissionLimits.add(e.getTransmissionLimits());
+            }
+        }
+
+        int firstSliceCurrentFreeSpace=-1;
+        int previousSlice=-1;
+        for(Collection<Integer> slicesSegments:availableSlicesSegments) {
+            for (Integer slice : slicesSegments) {
+                if (firstSliceCurrentFreeSpace == -1) {
+                    firstSliceCurrentFreeSpace = slice;
+                    previousSlice = slice;
+                } else {
+                    if (previousSlice + 1 == slice) {
+                        previousSlice = slice;
+                    } else {
+                        int extraSlicesNeeded=minBitRate-(previousSlice-firstSliceCurrentFreeSpace);
+                        Collection<Integer> impossiblesSlices= workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, extraSlicesNeeded);
+                        Collection<Integer> availableSlices=allSlices;
+                        availableSlices.removeAll(impossiblesSlices);
+                        System.out.println("Slices available:");
+                        for(Integer sliceAvailable:availableSlices){
+                            System.out.print(sliceAvailable+" ");
+                        }
+                        System.out.println();
+                        int maxContinuity=maxContinuity(availableSlices);
+                        //TODO transform into something
+                        if (maxContinuity>=minBitRate){
+                            System.out.println("Found");
+                        }
+                        firstSliceCurrentFreeSpace = slice;
+                        previousSlice = slice;
+                    }
+                }
+            }
+        }
+        if (previousSlice!=-1) {
+            int extraSlicesNeeded = minBitRate - (previousSlice - firstSliceCurrentFreeSpace);
+            Collection<Integer> impossiblesSlices = workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, extraSlicesNeeded);
+            Collection<Integer> availableSlices = allSlices;
+            availableSlices.removeAll(impossiblesSlices);
+            System.out.println("Slices available:");
+            for (Integer sliceAvailable : availableSlices) {
+                System.out.print(sliceAvailable + " ");
+            }
+            System.out.println();
+            int maxContinuity = maxContinuity(availableSlices);
+            //TODO transform into something
+            if (maxContinuity >= minBitRate) {
+                System.out.println("Found");
+            }
+                /*Test with the last free range of the list*/
+        }
+        return false;
+    }
+
+    static private Set<Integer> workOnSegment(Path path, int minSlice, int maxSlice, int extraSlicesNeeded){
+        Set<Integer> impossibleSlices=new LinkedHashSet<>();
+        for (Edge e : E) {
+            if (path.hasEdge(e)) {
+                Set<Integer> result=e.workOnSegment(minSlice, maxSlice, extraSlicesNeeded);
+                impossibleSlices.addAll(result);
+            }
+        }
+        return impossibleSlices;
+    }
+
+
+    static private int maxContinuity(Collection<Integer> S) {
+    /*Testing for continuous portions of slices*/
+        int previousSlice = -2;
+        int maxContinous = -2;
+        int currentContinous = 1;
+        for (Integer slice : S) {
+            if (slice == previousSlice + 1) {
+                    /*Continous case*/
+                currentContinous += 1;
+                if (currentContinous > maxContinous) maxContinous = currentContinous;
+            } else {
+                if (currentContinous > maxContinous) maxContinous = currentContinous;
+                currentContinous = 1;
+            }
+            previousSlice = slice;
+        }
+        return maxContinous;
+    }
+
 }
