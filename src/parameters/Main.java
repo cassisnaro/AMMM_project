@@ -228,6 +228,7 @@ public class Main {
                                     previousSlice=slice;
                                 }else{
                                     boolean reschedulePossible= workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded-(previousSlice-firstSliceCurrentFreeSpace), e);
+                                	
                                     if (reschedulePossible){
                                         System.out.println("one path found");
                                         break;

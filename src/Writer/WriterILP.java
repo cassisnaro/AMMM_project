@@ -77,7 +77,7 @@ public class WriterILP {
 
         File fileParent= new File(System.getProperty("user.dir"));
         try {
-            transferCollections.formatData(new FileOutputStream(new File(fileParent,"output_T_gaby_v1.txt").getPath()));
+            transferCollections.formatData(new FileOutputStream(new File(fileParent,"output_test_v2.txt").getPath()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

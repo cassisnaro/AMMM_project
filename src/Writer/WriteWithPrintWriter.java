@@ -33,7 +33,7 @@ public class WriteWithPrintWriter {
 		this.requestedTransfer = rt;
 
         File fileParent= new File(System.getProperty("user.dir"));
-        fFilePath = new File(fileParent,"output_P_gaby_v1.txt").getPath();
+        fFilePath = new File(fileParent,"output_test_v1.txt").getPath();
 		processWriteLineByLine();
 	}
 	
@@ -41,45 +41,92 @@ public class WriteWithPrintWriter {
 		PrecomputePathsWithTransmissions precomputer = new PrecomputePathsWithTransmissions(graph);
 		
 		try (PrintWriter writer = new PrintWriter(fFilePath, ENCODING.name())) {
+			writer.write("nA="+transferCollections.getRequestedTransfer().getA().size()+";\n");
+			writer.write("nA0="+transferCollections.getMaxA0()+";\n");
+			writer.write("nA1="+transferCollections.getMaxA1()+";\n");
+			writer.write("nS="+transferCollections.getMaxFreq()+";\n");
+			writer.write("nT="+transferCollections.getMaxTime()+";\n");
+			writer.write("nR="+transferCollections.getTransfers().size()+";\n");
+			
+			ArrayList<Path> pathsForRequestedTransfer = new ArrayList<Path>();
+            precomputer.precumputePathsFromTransmission(graph.getNodeNameFromIdentifier(requestedTransfer.getNode_origin()), graph.getNodeNameFromIdentifier(requestedTransfer.getNode_destination()));
+            pathsForRequestedTransfer.addAll(precomputer.getPaths());
+            
+            Set<Edge> edges = graph.getEdges();			
 			List<Edge> foundLinks = new ArrayList<Edge>();			
 			Set<String> nodes = graph.getNodes();
 			Edge auxPair;
-//			ArrayList<Path> paths;
 			ArrayList<Path> allPaths = new ArrayList<Path>();
-//			String pathLine;
+			int linksSize = edges.size();
+			int allPathsSize = allPaths.size();
+			int auxCounter1;
+			int auxCounter2 = 1;
+			
+			writer.write("nE="+edges.size()+";\n");
+            writer.write("nP="+pathsForRequestedTransfer.size()+";\n");
+            writer.write("rho_pe=[\n");
+
+            for (Path p : pathsForRequestedTransfer) {            	
+                auxCounter1 = 1;
+
+                writer.write("[");
+
+                for (Edge e : edges) {
+                    if (p.hasEdge(e)) {
+                        writer.write("1");
+                    }
+                    else {
+                        writer.write("0");
+                    }
+
+                    if (auxCounter1 < linksSize) {
+                        writer.write(", ");
+                    }
+
+                    auxCounter1++;
+                }
+
+                writer.write("]\n");
+            }
+
+            writer.write("];\n\n");
+			
+			writer.write("rho_re=[\n");
+			
+			List<Transfer> transfers = transferCollections.getTransfers();
+			
+			for (Transfer t : transfers) {				
+				auxCounter1 = 1;
+				
+				writer.write("[");
+				
+				for (Edge e : edges) {
+					if (t.getPath().hasEdge(e)) {
+						writer.write("1");
+					}
+					else {
+						writer.write("0");
+					}
+					
+					if (auxCounter1 < linksSize) {
+						writer.write(", ");
+					}
+					
+					auxCounter1++;
+				}
+				
+				writer.write("]\n");	
+			}
+			
+			writer.write("];\n");
 			
 			for (String s : nodes) {
 				for (String d : nodes) {
 					if (!s.equals(d)) {
 						auxPair = new Edge(s, d);
-
-//						System.out.println("FOUND PATHS: ");
-//						
-//						for (Edge pair : foundLinks) {
-//							System.out.print("(" + pair.getSource() + ", " + pair.getDestination() + ") ");
-//						}
-//						
-//						System.out.print("\n");
 						
-						if (!Edge.containsPair(foundLinks, auxPair)) {
-//							System.out.println("COMPUTING PATHS BETWEEN (" + s + ", " + d + ")");
-							
-							precomputer.precumputePathsFromTransmission(s, d);
-							
-//							paths = precomputer.getPaths();
-//							
-//							System.out.println("------------ PATHS BETWEEN (" + s + ", " + d + ") OR (" + d + ", " + s + ") ------------");
-//							System.out.println("------------ TOTAL: " + paths.size());
-//							
-//							for (Path p : paths) {
-//								pathLine = "";
-//								
-//								for (NodePair node : p.getPath()) {
-//									pathLine += node.getName() + " ";
-//								}
-//								
-//								System.out.println(pathLine);								
-//							}
+						if (!Edge.containsPair(foundLinks, auxPair)) {							
+							precomputer.precumputePathsFromTransmission(s, d);						
 							
 							allPaths.addAll(precomputer.getPaths());
 							
@@ -90,14 +137,9 @@ public class WriteWithPrintWriter {
 				}
 			}
 			
-//			System.out.println("TOTAL PATHS IN WHOLE GRAPH: " + allPaths.size());
+			transferCollections.printTransferCollectionsParameters(writer);
 			
-			Set<Edge> edges = graph.getEdges();
-			int linksSize = edges.size();
-			int allPathsSize = allPaths.size();
-			int auxCounter1;
-			int auxCounter2 = 1;
-			String pathLine;
+			writer.write("\n");
 			
 			writer.write("paths=[\n");
 			
@@ -131,157 +173,6 @@ public class WriteWithPrintWriter {
 			}
 			
 			writer.write("]\n\n");
-
-//            String requestedTransferStart=new String("a");
-//            String requestedTransferEnd=new String("e");
-            ArrayList<Path> pathsForRequestedTransfer = new ArrayList<Path>();
-            precomputer.precumputePathsFromTransmission(graph.getNodeNameFromIdentifier(requestedTransfer.getNode_origin()), graph.getNodeNameFromIdentifier(requestedTransfer.getNode_destination()));
-            pathsForRequestedTransfer.addAll(precomputer.getPaths());
-
-
-            edges = graph.getEdges();
-            linksSize = edges.size();
-            allPathsSize = allPaths.size();
-//            auxCounter2 = 1;
-
-            writer.write("nE="+edges.size()+";\n");
-            writer.write("nP="+pathsForRequestedTransfer.size()+";\n");
-            writer.write("rho_pe=[\n");
-
-            for (Path p : pathsForRequestedTransfer) {
-            	pathLine = "";
-				
-				for (NodePair node : p.getPath()) {
-					pathLine += node.getName() + " ";
-				}
-				
-				System.out.println(pathLine);
-            	
-                auxCounter1 = 1;
-
-                writer.write("[");
-
-                for (Edge e : edges) {
-                    if (p.hasEdge(e)) {
-                        writer.write("1");
-                    }
-                    else {
-                        writer.write("0");
-                    }
-
-                    if (auxCounter1 < linksSize) {
-                        writer.write(", ");
-                    }
-
-                    auxCounter1++;
-                }
-
-                writer.write("]\n");
-
-//                if (auxCounter2 < pathsForRequestedTransfer.size()) {
-//                    writer.write(",\n");
-//                }
-//
-//                auxCounter2++;
-            }
-
-            writer.write("];\n\n");
-			
-//			auxCounter2 = 1;
-			
-			writer.write("rho_re=[\n");
-			
-			List<Transfer> transfers = transferCollections.getTransfers();
-			
-			for (Transfer t : transfers) {				
-				auxCounter1 = 1;
-				
-				writer.write("[");
-				
-				for (Edge e : edges) {
-					if (t.getPath().hasEdge(e)) {
-						writer.write("1");
-					}
-					else {
-						writer.write("0");
-					}
-					
-					if (auxCounter1 < linksSize) {
-						writer.write(", ");
-					}
-					
-					auxCounter1++;
-				}
-				
-				writer.write("]\n");
-				
-//				if (auxCounter2 < allPathsSize) {
-//					writer.write(",\n");
-//				}
-//				
-//				auxCounter2++;	
-			}
-			
-			writer.write("];\n");
-			
-//			for (Pair t : transmissions) {
-//				precomputer.precumputePathsFromTransmission(t.getSource(), t.getDestination());
-//				
-//				ArrayList<Path> paths = precomputer.getPaths();
-//				
-//				writer.write(paths.size() + " ");
-//				writer.write("(" + t.getSource() + "," + t.getDestination() + ")\n");
-//				
-//				String pathLine;
-//				
-//				for (Path path : paths) {
-//					pathLine = "";
-//					
-//					for (NodePair node : path.getPath()) {
-//						pathLine += node.getName() + " ";
-//					}
-//					
-//					writer.write(path.getCost() + " " + pathLine + "\n");
-//				}
-//			} 
-//			
-//			writer.write("paths=[");
-//			
-//			Map<Link, Integer> identifiers;
-//			Set<Link> links;
-//			ArrayList<Path> paths;
-//			
-//			for (Pair t : transmissions) {
-//				writer.write("[");
-//				
-//				precomputer.precumputePathsFromTransmission(t.getSource(), t.getDestination());
-//				
-//				paths = precomputer.getPaths();
-//				
-//				identifiers = graph.getLinksIdentifier();
-//				links = identifiers.keySet();				
-//				
-//				for (Path path : paths) {
-//					System.out.println(path.toString());
-//					
-//					writer.write("[");				
-//					
-//					for (Link l : links) {
-//						if (path.hasLink(l)) {
-//							writer.write("1, ");
-//						}
-//						else {
-//							writer.write("0, ");
-//						}
-//					}
-//					
-//					writer.write("], \n");
-//				}
-//				
-//				writer.write("], \n");
-//			}
-//			
-//			writer.write("]\n");
 
 			writer.close();
 		}
