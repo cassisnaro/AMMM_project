@@ -108,7 +108,7 @@ public class Main {
             for (Path p : P) {
                 boolean reschedulePossible =hardReschedulePossible(p, slicesNeeded);
                 if (reschedulePossible) {
-                    System.out.println("one path found, hard");
+                    System.out.println("one path found, half hard");
                     reroutingPath = p;
                     break;
                 }
@@ -132,7 +132,7 @@ public class Main {
                 System.out.println();
             }
         }
-        Collection<Integer> availableSlices=new LinkedHashSet<>(allSlices);
+        Collection<Integer> availableSlices=allSlices;
         availableSlices.removeAll(impossibleSlicesForPath);
         for(Integer slice:availableSlices){
             System.out.print(slice+" ");

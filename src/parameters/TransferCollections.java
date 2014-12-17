@@ -1,7 +1,9 @@
 package parameters;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Writer;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +39,23 @@ public class TransferCollections {
     	return transfers;
     }
 
-    public void add_transfer(Transfer transfer){
+    public int getMaxFreq() {
+		return maxFreq;
+	}
+
+	public int getMaxTime() {
+		return maxTime;
+	}
+
+	public int getMaxA0() {
+		return maxA0;
+	}
+
+	public int getMaxA1() {
+		return maxA1;
+	}
+
+	public void add_transfer(Transfer transfer){
         transfer.computeRectanglesSets(maxFreq);
         transfers.add(transfer);
         if (transfer.getTime_completion()>maxTime){
@@ -50,7 +68,8 @@ public class TransferCollections {
             maxA1=transfer.getA1().size();
         }
     }
-    public void formatData(FileOutputStream file){
+    
+	public void formatData(FileOutputStream file){
         LinkedHashSet<Rectangle> A0s, A1s;
         A0s=new LinkedHashSet<Rectangle>();
         A1s=new LinkedHashSet<Rectangle>();
@@ -334,5 +353,277 @@ public class TransferCollections {
         printStream.print("];");
         printStream.close();
 
+    }
+	
+	public void printTransferCollectionsParameters(Writer writer) throws IOException {
+        LinkedHashSet<Rectangle> A0s, A1s;
+        A0s=new LinkedHashSet<Rectangle>();
+        A1s=new LinkedHashSet<Rectangle>();
+
+        writer.write("mA=[");
+        A0s.clear();
+        A0s.addAll(requestedTransfer.getA());
+        for(Rectangle rectangle:A0s){
+            writer.write("[");
+            for(int freq=0; freq<maxFreq; freq++){
+                if (freq!=0){
+                    writer.write(", ");
+                }
+                if (rectangle.frequencyBelongsToRectangle(freq)){
+                    writer.write("1");
+                } else {
+                    writer.write("0");
+                }
+            }
+            writer.write("]\n");
+        }
+        writer.write("];\n");
+
+
+        writer.write("mA0=[");
+        for(Transfer transfer: transfers){
+            A0s.clear();
+            A0s.addAll(transfer.getA0());
+            writer.write("[");
+            for(Rectangle rectangle:A0s){                
+                writer.write("[");
+                for(int freq=0; freq<maxFreq; freq++){
+                    if (freq!=0){
+                        writer.write(", ");
+                    }
+                    if (rectangle.frequencyBelongsToRectangle(freq)){
+                        writer.write("1");
+                    } else {
+                        writer.write("0");
+                    }
+                }
+                writer.write("]\n");
+            }
+            for(int extraRectangle=A0s.size();extraRectangle<maxA0;extraRectangle++){
+                writer.write("[");
+                for(int freq=0; freq<maxFreq; freq++){
+                    if (freq!=0){
+                        writer.write(", ");
+                    }
+                    writer.write("0");
+                }
+                writer.write("]\n");
+            }
+            writer.write("]\n");
+        }
+        writer.write("];\n");
+
+        writer.write("mA1=[");
+        for(Transfer transfer: transfers){
+            A1s.clear();
+            A1s.addAll(transfer.getA1());
+            writer.write("[");
+            for(Rectangle rectangle:A1s){
+                writer.write("[");
+                for(int freq=0; freq<maxFreq; freq++){
+                    if (freq!=0){
+                        writer.write(", ");
+                    }
+                    if (rectangle.frequencyBelongsToRectangle(freq)){
+                        writer.write("1");
+                    } else {
+                        writer.write("0");
+                    }
+                }
+                writer.write("]\n");
+            }
+            for(int extraRectangle=A1s.size();extraRectangle<maxA1;extraRectangle++){
+                writer.write("[");
+                for(int freq=0; freq<maxFreq; freq++){
+                    if (freq!=0){
+                        writer.write(", ");
+                    }
+                    writer.write("0");
+                }
+                writer.write("]\n");
+            }
+           
+            writer.write("]\n");
+        }
+        writer.write("];\n");
+
+        writer.write("beta_ra0a1=[");
+        for(Transfer transfer: transfers){
+            A0s.clear();
+            A0s.addAll(transfer.getA0());
+            A1s.clear();
+            A1s.addAll(transfer.getA1());
+            writer.write("[");
+            for(Rectangle rectangleA0:A0s){
+                writer.write("[");
+                boolean first=true;
+                for(Rectangle rectangleA1:A1s){
+                    if(first) {
+                        first=false;
+                    }else {
+                        writer.write(", ");
+                    }
+
+                    if (transfer.computeFeasibility(rectangleA0, rectangleA1)){
+                        writer.write("1");
+                    } else {
+                        writer.write("0");
+                    }
+                }
+                for(int extraRectangleA1=A1s.size(); extraRectangleA1<maxA1; extraRectangleA1++){
+                    writer.write(", 0");
+                }
+                writer.write("]\n");
+            }
+            for(int extraRectangleA0=A0s.size(); extraRectangleA0<maxA0; extraRectangleA0++){
+                boolean first=true;
+                writer.write("[");
+                for(int extraRectangleA1=0; extraRectangleA1<maxA1; extraRectangleA1++){
+                    if(first) {
+                        first=false;
+                    }else {
+                        writer.write(", ");
+                    }
+                    writer.write("0");
+                }
+                writer.write("]");
+            }
+            writer.write("]\n");
+        }
+        writer.write("];\n");
+
+        writer.write("gamma_at=[");
+        A0s.clear();
+        A0s.addAll(requestedTransfer.getA());
+
+        for(Rectangle rectangle:A0s) {
+            boolean first=true;
+            writer.write("[");
+            for(int t=0; t<maxTime; t++){
+                if(first) {
+                    first=false;
+                }else {
+                    writer.write(", ");
+                }
+                if (rectangle.getT_start()<=t && t<rectangle.getT_end()){
+                    writer.write("1");
+                } else {
+                    writer.write("0");
+                }
+            }
+            writer.write("]");
+
+        }
+        writer.write("];\n");
+
+        writer.write("gamma_a0t=[");
+        for(Transfer transfer: transfers){
+            A0s.clear();
+            A0s.addAll(transfer.getA0());
+            writer.write("[");
+
+            for(Rectangle rectangle:A0s) {
+                boolean first=true;
+                writer.write("[");
+                for(int t=0; t<maxTime; t++){
+                    if(first) {
+                        first=false;
+                    }else {
+                        writer.write(", ");
+                    }
+                    if (rectangle.getT_start()<=t && t<rectangle.getT_end()){
+                        writer.write("1");
+                    } else {
+                        writer.write("0");
+                    }
+                }
+                writer.write("]");
+            }
+            for(int extraRectangleA0=A0s.size(); extraRectangleA0<maxA0; extraRectangleA0++){
+                boolean first=true;
+                writer.write("[");
+                for(int t=0; t<maxTime; t++){
+                    if(first) {
+                        first=false;
+                    }else {
+                        writer.write(", ");
+                    }
+                    writer.write("0");
+
+                }
+                writer.write("]");
+            }
+            writer.write("]\n");
+        }
+        writer.write("];\n");
+
+        writer.write("gamma_a1t=[");
+        for(Transfer transfer: transfers){
+            A1s.clear();
+            A1s.addAll(transfer.getA1());
+            writer.write("[");
+
+            for(Rectangle rectangle:A1s) {
+                boolean first=true;
+                writer.write("[");
+                for(int t=0; t<maxTime; t++){
+                    if(first) {
+                        first=false;
+                    }else {
+                        writer.write(", ");
+                    }
+                    if (rectangle.getT_start()<=t && t<rectangle.getT_end()){
+                        writer.write("1");
+                    } else {
+                        writer.write("0");
+                    }
+                }
+                writer.write("]");
+            }
+            for(int extraRectangleA1=A1s.size(); extraRectangleA1<maxA1; extraRectangleA1++){
+                boolean first=true;
+                writer.write("[");
+                for(int t=0; t<maxTime; t++){
+                    if(first) {
+                        first=false;
+                    }else {
+                        writer.write(", ");
+                    }
+                    writer.write("0");
+
+                }
+                writer.write("]");
+            }
+            writer.write("]\n");
+        }
+        writer.write("];\n");
+
+        writer.write("omega_ar=[");
+        for(Transfer transfer: transfers) {
+            A0s.clear();
+            A0s.addAll(transfer.getA0());
+            writer.write("[");
+            boolean first = true;
+            boolean found = false;
+            for (Rectangle rectangle : A0s) {
+                if (first) {
+                    first = false;
+                } else {
+                    writer.write(", ");
+                }
+                if (transfer.rectangleConformantAllocation(rectangle)) {
+                    writer.write("1");
+                    found = true;
+                } else {
+                    writer.write("0");
+                }
+
+            }
+            for (int extraRectangleA0 = A0s.size(); extraRectangleA0 < maxA0; extraRectangleA0++) {
+                writer.write(", 0");
+            }
+            writer.write("]");
+        }
+        writer.write("];");
     }
 }

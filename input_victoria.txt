@@ -1,20 +1,18 @@
+S
+5
 N
-a b c d e f
+a b c d e
 G
-(a,b,1) (a,d,1) (a,b,1) (b,e,1) (c,f,1) (d,e,1) (e,f,1)
+(a,b,1) (a,d,1) (b,c,1) (b,e,1) (d,e,1) (e,c,1)
 T1
-d e 
+d e / 4 2 0 1 2
 T2
-a d e
+a b e / 2 2 1 2 1
 T3
-d e f
+b e c / 5 3 0 1 1
 T4
-e f
+a d / 3 2 1 2 1
 T5
-b e f
-T6
-c f e
-T7
-a d e f
+a b c / 7 4 0 2 2
 RT
-a f 4 5
+a e 3 5
