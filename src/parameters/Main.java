@@ -86,6 +86,8 @@ public class Main {
                             if (reschedulePossible){
                                 System.out.println("one path found");
                                 break;
+                            }else{
+                                Transfer.resetReschedules();
                             }
                             firstSliceCurrentFreeSpace=slice;
                             previousSlice=slice;
@@ -99,6 +101,8 @@ public class Main {
                         System.out.println("one path found, half hard");
                         reroutingPath = p;
                         break;
+                    }else{
+                        Transfer.resetReschedules();
                     }
                 }
             }
@@ -110,7 +114,10 @@ public class Main {
                 if (reschedulePossible) {
                     System.out.println("one path found, half hard");
                     reroutingPath = p;
+                    System.out.println("It needs: "+Transfer.getTotalReschedules()+" reschedules");
                     break;
+                }else{
+                    Transfer.resetReschedules();
                 }
             }
         }
@@ -185,6 +192,8 @@ public class Main {
                         if (maxContinuity>=minBitRate){
                             System.out.println("Found");
                             return true;
+                        }else{
+                            Transfer.resetReschedules();
                         }
                         firstSliceCurrentFreeSpace = slice;
                         previousSlice = slice;
@@ -202,10 +211,11 @@ public class Main {
                 }
                 System.out.println();
                 int maxContinuity = maxContinuity(availableSlices);
-                //TODO transform into something
                 if (maxContinuity >= minBitRate) {
                     System.out.println("Found");
                     return true;
+                }else{
+                    Transfer.resetReschedules();
                 }
             }
         }
@@ -238,6 +248,8 @@ public class Main {
                                         if (maxContinuity >= slicesNeeded) {
                                             System.out.println("one path found");
                                             return true;
+                                        }else{
+                                            Transfer.resetReschedules();
                                         }
                                         firstSliceCurrentFreeSpace = slice;
                                         previousSlice = slice;
@@ -253,6 +265,8 @@ public class Main {
                                 if (maxContinuity >= slicesNeeded) {
                                     System.out.println("one path found");
                                     return true;
+                                }else{
+                                    Transfer.resetReschedules();
                                 }
                             }
                         }

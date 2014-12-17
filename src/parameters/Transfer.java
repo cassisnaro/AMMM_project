@@ -31,7 +31,13 @@ public class Transfer {
         return totalReschedules;
     }
 
-    //public static
+    public static void resetReschedules(){
+        totalReschedules=0;
+    }
+
+    private static void addReschedule(){
+        totalReschedules++;
+    }
 
     public Set<Integer> getCurrentSlices() {
         return currentSlices;
@@ -79,6 +85,7 @@ public class Transfer {
         for(int i=from; i<=to; i++){
             tmpSlices.add(new Integer(i));
         }
+        addReschedule();
     }
     public void setTemporarySlices2(int from, int to){
         if (tmpSlices2==null){
