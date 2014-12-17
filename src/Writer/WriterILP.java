@@ -36,29 +36,23 @@ public class WriterILP {
 //    	transferCollections.setRequestedTransfer(new RequestedTransfer(0,3,2,3));
 
     	//Victoria's example
-//    	TransferCollections transferCollections = new TransferCollections(6);
-//    	Transfer newTransfer = new Transfer(3,4,2,4);
-//    	newTransfer.setCurrentAllocation(0,2,3);
+//    	TransferCollections transferCollections = new TransferCollections(4);
+//    	Transfer newTransfer = new Transfer(3,4,4,2);
+//    	newTransfer.setCurrentAllocation(0,1,2);
 //    	transferCollections.add_transfer(newTransfer);
-//    	newTransfer = new Transfer(0,4,4,6);
-//    	newTransfer.setCurrentAllocation(1,4,4);
+//    	newTransfer = new Transfer(0,4,2,2);
+//    	newTransfer.setCurrentAllocation(1,2,1);
 //    	transferCollections.add_transfer(newTransfer);
-//    	newTransfer = new Transfer(3,5,3,3);
-//    	newTransfer.setCurrentAllocation(1,3,3);
+//    	newTransfer = new Transfer(1,2,5,3);
+//    	newTransfer.setCurrentAllocation(0,1,1);
 //    	transferCollections.add_transfer(newTransfer);
-//    	newTransfer = new Transfer(1,5,2,3);
-//    	newTransfer.setCurrentAllocation(2, 4, 3);
+//    	newTransfer = new Transfer(0,3,3,2);
+//    	newTransfer.setCurrentAllocation(1,2,1);
 //    	transferCollections.add_transfer(newTransfer);
-//    	newTransfer = new Transfer(1,4,2,2);
-//    	newTransfer.setCurrentAllocation(0,3,2);
+//    	newTransfer = new Transfer(0,2,7,4);
+//    	newTransfer.setCurrentAllocation(0,2,2);
 //    	transferCollections.add_transfer(newTransfer);
-//    	newTransfer = new Transfer(2,4,5,4);
-//    	newTransfer.setCurrentAllocation(1,3,4);
-//    	transferCollections.add_transfer(newTransfer);
-//    	newTransfer = new Transfer(0,5,3,2);
-//    	newTransfer.setCurrentAllocation(2,4,4);
-//    	transferCollections.add_transfer(newTransfer);
-//    	transferCollections.setRequestedTransfer(new RequestedTransfer(0,5,3,4));
+//    	transferCollections.setRequestedTransfer(new RequestedTransfer(0,4,3,5));
     	
         TransferCollections transferCollections = new TransferCollections(5);
         Transfer newTransfer = new Transfer(0,5,6,6);
