@@ -158,9 +158,10 @@ public class Main {
             }
         }
 
-        int firstSliceCurrentFreeSpace=-1;
-        int previousSlice=-1;
+
         for(Collection<Integer> slicesSegments:availableSlicesSegments) {
+            int firstSliceCurrentFreeSpace=-1;
+            int previousSlice=-1;
             for (Integer slice : slicesSegments) {
                 if (firstSliceCurrentFreeSpace == -1) {
                     firstSliceCurrentFreeSpace = slice;
@@ -188,33 +189,86 @@ public class Main {
                     }
                 }
             }
-        }
-        if (previousSlice!=-1) {
-            int extraSlicesNeeded = minBitRate - (previousSlice - firstSliceCurrentFreeSpace);
-            Collection<Integer> impossiblesSlices = workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, extraSlicesNeeded);
-            Collection<Integer> availableSlices = allSlices;
-            availableSlices.removeAll(impossiblesSlices);
-            System.out.println("Slices available:");
-            for (Integer sliceAvailable : availableSlices) {
-                System.out.print(sliceAvailable + " ");
-            }
-            System.out.println();
-            int maxContinuity = maxContinuity(availableSlices);
-            //TODO transform into something
-            if (maxContinuity >= minBitRate) {
-                System.out.println("Found");
-            }
+            if (previousSlice!=-1) {
+                int extraSlicesNeeded = minBitRate - (previousSlice - firstSliceCurrentFreeSpace);
+                Collection<Integer> impossiblesSlices = workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, extraSlicesNeeded);
+                Collection<Integer> availableSlices = allSlices;
+                availableSlices.removeAll(impossiblesSlices);
+                System.out.println("Slices available:");
+                for (Integer sliceAvailable : availableSlices) {
+                    System.out.print(sliceAvailable + " ");
+                }
+                System.out.println();
+                int maxContinuity = maxContinuity(availableSlices);
+                //TODO transform into something
+                if (maxContinuity >= minBitRate) {
+                    System.out.println("Found");
+                }
                 /*Test with the last free range of the list*/
+            }
+        }
+
+        for(Collection<Integer> transmissionsIntersections:availableTransmissionLimits) {
+            for(Integer intersection:transmissionsIntersections){
+                for (Edge e : E) {
+                    Collection<Integer> availableSlices = allSlices;
+                    if (path.hasEdge(e)) {
+                        availableSlices.removeAll(e.workOnTransferIntersection(intersection, slicesNeeded));
+                    }
+                    int maxContinuity = maxContinuity(availableSlices);
+                    if (maxContinuity>=slicesNeeded){
+                        int firstSliceCurrentFreeSpace=-1;
+                        int previousSlice=-1;
+                        for(Integer slice:availableSlices){
+                            if(firstSliceCurrentFreeSpace==-1){
+                                firstSliceCurrentFreeSpace=slice;
+                                previousSlice=slice;
+                            }else{
+                                if(previousSlice+1==slice){
+                                    previousSlice=slice;
+                                }else{
+                                    boolean reschedulePossible= workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded-(previousSlice-firstSliceCurrentFreeSpace), e);
+                                    if (reschedulePossible){
+                                        System.out.println("one path found");
+                                        break;
+                                    }
+                                    firstSliceCurrentFreeSpace=slice;
+                                    previousSlice=slice;
+                                }
+                            }
+                        }
+                        /*Test with the last free range of the list*/
+                        if(previousSlice!=-1) {
+
+
+
+                        }
+                    }
+                }
+            }
         }
         return false;
     }
 
     static private Set<Integer> workOnSegment(Path path, int minSlice, int maxSlice, int extraSlicesNeeded){
+        return workOnSegment( path,  minSlice,  maxSlice,  extraSlicesNeeded, null)
+    }
+
+    static private Set<Integer> workOnSegment(Path path, int minSlice, int maxSlice, int extraSlicesNeeded, Edge edgeToAvoid){
         Set<Integer> impossibleSlices=new LinkedHashSet<>();
         for (Edge e : E) {
-            if (path.hasEdge(e)) {
-                Set<Integer> result=e.workOnSegment(minSlice, maxSlice, extraSlicesNeeded);
-                impossibleSlices.addAll(result);
+            if (edgeToAvoid==null) {
+                if (path.hasEdge(e)) {
+                    Set<Integer> result = e.workOnSegment(minSlice, maxSlice, extraSlicesNeeded);
+                    impossibleSlices.addAll(result);
+                }
+            } else {
+                if(!e.isEqual(edgeToAvoid)){
+                    if (path.hasEdge(e)) {
+                        Set<Integer> result = e.workOnSegment(minSlice, maxSlice, extraSlicesNeeded);
+                        impossibleSlices.addAll(result);
+                    }
+                }
             }
         }
         return impossibleSlices;
