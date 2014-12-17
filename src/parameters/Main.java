@@ -252,7 +252,7 @@ public class Main {
     }
 
     static private Set<Integer> workOnSegment(Path path, int minSlice, int maxSlice, int extraSlicesNeeded){
-        return workOnSegment( path,  minSlice,  maxSlice,  extraSlicesNeeded, null)
+        return workOnSegment( path,  minSlice,  maxSlice,  extraSlicesNeeded, null);
     }
 
     static private Set<Integer> workOnSegment(Path path, int minSlice, int maxSlice, int extraSlicesNeeded, Edge edgeToAvoid){
