@@ -47,7 +47,7 @@ public class Main {
         Path reroutingPath=null;
         for (Path p : P) {
             E = G.getEdges();
-            Collection<Integer> S = allSlices;
+            Collection<Integer> S = new LinkedHashSet<>(allSlices);
             for (Edge e : E) {
                 if (p.hasEdge(e)) {
                     S = e.getFreeSlices(S);
@@ -65,7 +65,7 @@ public class Main {
             System.out.println("trivial case failed");
             for (Path p : P) {
                 E = G.getEdges();
-                Collection<Integer>S = allSlices;
+                Collection<Integer>S = new LinkedHashSet<>(allSlices);
                 for (Edge e : E) {
                     if (p.hasEdge(e)) {
                         S = e.getFreeSlices(S);
@@ -151,7 +151,7 @@ public class Main {
 
         for (Edge e : E) {
             if (path.hasEdge(e)) {
-                Collection<Integer> S = allSlices;
+                Collection<Integer> S = new LinkedHashSet<>(allSlices);
                 S = e.getFreeSlices(S);
                 availableSlicesSegments.add(S);
                 availableTransmissionLimits.add(e.getTransmissionLimits());
@@ -162,6 +162,7 @@ public class Main {
         for(Collection<Integer> slicesSegments:availableSlicesSegments) {
             int firstSliceCurrentFreeSpace=-1;
             int previousSlice=-1;
+            System.out.println("trying with "+slicesSegments.size()+" slices");
             for (Integer slice : slicesSegments) {
                 if (firstSliceCurrentFreeSpace == -1) {
                     firstSliceCurrentFreeSpace = slice;
@@ -172,7 +173,7 @@ public class Main {
                     } else {
                         int extraSlicesNeeded=minBitRate-(previousSlice-firstSliceCurrentFreeSpace);
                         Collection<Integer> impossiblesSlices= workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, extraSlicesNeeded);
-                        Collection<Integer> availableSlices=allSlices;
+                        Collection<Integer> availableSlices=new LinkedHashSet<>(allSlices);
                         availableSlices.removeAll(impossiblesSlices);
                         System.out.println("Slices available:");
                         for(Integer sliceAvailable:availableSlices){
@@ -183,6 +184,7 @@ public class Main {
                         //TODO transform into something
                         if (maxContinuity>=minBitRate){
                             System.out.println("Found");
+                            return true;
                         }
                         firstSliceCurrentFreeSpace = slice;
                         previousSlice = slice;
@@ -192,7 +194,7 @@ public class Main {
             if (previousSlice!=-1) {
                 int extraSlicesNeeded = minBitRate - (previousSlice - firstSliceCurrentFreeSpace);
                 Collection<Integer> impossiblesSlices = workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, extraSlicesNeeded);
-                Collection<Integer> availableSlices = allSlices;
+                Collection<Integer> availableSlices = new LinkedHashSet<>(allSlices);
                 availableSlices.removeAll(impossiblesSlices);
                 System.out.println("Slices available:");
                 for (Integer sliceAvailable : availableSlices) {
@@ -203,51 +205,62 @@ public class Main {
                 //TODO transform into something
                 if (maxContinuity >= minBitRate) {
                     System.out.println("Found");
+                    return true;
                 }
-                /*Test with the last free range of the list*/
             }
         }
+        System.out.println("Failed with slices segments");
 
+        System.out.println("Trying with intersections");
         for(Collection<Integer> transmissionsIntersections:availableTransmissionLimits) {
             for(Integer intersection:transmissionsIntersections){
+                System.out.println("\tintersection:"+intersection.toString());
                 for (Edge e : E) {
-                    Collection<Integer> availableSlices = allSlices;
+                    Collection<Integer> availableSlices = new LinkedHashSet<>(allSlices);
                     if (path.hasEdge(e)) {
-                        availableSlices.removeAll(e.workOnTransferIntersection(intersection, slicesNeeded));
-                    }
-                    int maxContinuity = maxContinuity(availableSlices);
-                    if (maxContinuity>=slicesNeeded){
-                        int firstSliceCurrentFreeSpace=-1;
-                        int previousSlice=-1;
-                        for(Integer slice:availableSlices){
-                            if(firstSliceCurrentFreeSpace==-1){
-                                firstSliceCurrentFreeSpace=slice;
-                                previousSlice=slice;
-                            }else{
-                                if(previousSlice+1==slice){
-                                    previousSlice=slice;
-                                }else{
-                                    boolean reschedulePossible= workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded-(previousSlice-firstSliceCurrentFreeSpace), e);
-                                	
-                                    if (reschedulePossible){
-                                        System.out.println("one path found");
-                                        break;
+                        availableSlices.removeAll(e.workOnTransferIntersection(intersection-1, slicesNeeded));
+                        int maxContinuity = maxContinuity(availableSlices);
+                        if (maxContinuity >= slicesNeeded) {
+                            int firstSliceCurrentFreeSpace = -1;
+                            int previousSlice = -1;
+                            for (Integer slice : availableSlices) {
+                                if (firstSliceCurrentFreeSpace == -1) {
+                                    firstSliceCurrentFreeSpace = slice;
+                                    previousSlice = slice;
+                                } else {
+                                    if (previousSlice + 1 == slice) {
+                                        previousSlice = slice;
+                                    } else {
+                                        Set<Integer> impossibleSlices = workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded - (previousSlice - firstSliceCurrentFreeSpace), e);
+                                        Collection<Integer> availableSlices2 = new LinkedHashSet<>(availableSlices);
+                                        availableSlices2.removeAll(impossibleSlices);
+                                        maxContinuity = maxContinuity(availableSlices2);
+                                        if (maxContinuity >= slicesNeeded) {
+                                            System.out.println("one path found");
+                                            return true;
+                                        }
+                                        firstSliceCurrentFreeSpace = slice;
+                                        previousSlice = slice;
                                     }
-                                    firstSliceCurrentFreeSpace=slice;
-                                    previousSlice=slice;
+                                }
+                            }
+                        /*Test with the last free range of the list*/
+                            if (previousSlice != -1) {
+                                Set<Integer> impossibleSlices = workOnSegment(path, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded - (previousSlice - firstSliceCurrentFreeSpace), e);
+                                Collection<Integer> availableSlices2 = new LinkedHashSet<>(availableSlices);
+                                availableSlices2.removeAll(impossibleSlices);
+                                maxContinuity = maxContinuity(availableSlices2);
+                                if (maxContinuity >= slicesNeeded) {
+                                    System.out.println("one path found");
+                                    return true;
                                 }
                             }
                         }
-                        /*Test with the last free range of the list*/
-                        if(previousSlice!=-1) {
-
-
-
-                        }
                     }
                 }
             }
         }
+        System.out.println("Failed with segments");
         return false;
     }
 
