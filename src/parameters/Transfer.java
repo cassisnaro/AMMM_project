@@ -6,6 +6,7 @@ import java.util.*;
  * Created by daniel on 15/11/14.
  */
 public class Transfer {
+    static int totalReschedules=0;
     int transferIdentifier;
     int node_origin;
     int node_destination;
@@ -25,6 +26,12 @@ public class Transfer {
         this.time_completion = time_completion;
         this.data_amount = data_amount;
     }
+
+    public static int getTotalReschedules() {
+        return totalReschedules;
+    }
+
+    //public static
 
     public Set<Integer> getCurrentSlices() {
         return currentSlices;
@@ -152,6 +159,8 @@ public class Transfer {
             for (int slicei = first_slice; slicei <= first_slice + min_slices - 1; slicei++) {
                 impossibleSlices.add(new Integer(slicei));
             }
+        } else {
+            impossibleSlices.addAll(currentSlices);
         }
         return impossibleSlices;
 
