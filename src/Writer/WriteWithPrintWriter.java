@@ -3,7 +3,6 @@ package Writer;
 import dctransfers.PrecomputePathsWithTransmissions;
 import parameters.Edge;
 import parameters.Graph;
-import parameters.NodePair;
 import parameters.Path;
 import parameters.RequestedTransfer;
 import parameters.Transfer;
@@ -141,38 +140,38 @@ public class WriteWithPrintWriter {
 			
 			writer.write("\n");
 			
-			writer.write("paths=[\n");
-			
-			for (Path p : allPaths) {
-				auxCounter1 = 1;
-				
-				writer.write("[");
-				
-				for (Edge e : edges) {
-					if (p.hasEdge(e)) {
-						writer.write("1");
-					}
-					else {
-						writer.write("0");
-					}
-					
-					if (auxCounter1 < linksSize) {
-						writer.write(", ");
-					}
-					
-					auxCounter1++;
-				}
-				
-				writer.write("]");
-				
-				if (auxCounter2 < allPathsSize) {
-					writer.write(",\n");
-				}
-				
-				auxCounter2++;				
-			}
-			
-			writer.write("]\n\n");
+//			writer.write("paths=[\n");
+//			
+//			for (Path p : allPaths) {
+//				auxCounter1 = 1;
+//				
+//				writer.write("[");
+//				
+//				for (Edge e : edges) {
+//					if (p.hasEdge(e)) {
+//						writer.write("1");
+//					}
+//					else {
+//						writer.write("0");
+//					}
+//					
+//					if (auxCounter1 < linksSize) {
+//						writer.write(", ");
+//					}
+//					
+//					auxCounter1++;
+//				}
+//				
+//				writer.write("]");
+//				
+//				if (auxCounter2 < allPathsSize) {
+//					writer.write(",\n");
+//				}
+//				
+//				auxCounter2++;				
+//			}
+//			
+//			writer.write("]\n\n");
 
 			writer.close();
 		}
