@@ -51,6 +51,8 @@ public class GRASPMain {
         List<Path> rclPaths = null;
 		Path auxPath = null;
         
+		long startTimeMain = System.currentTimeMillis();
+		
         while (copyOfP.size() != 0) {
         	rclPaths = getRCLPaths(copyOfP);
 			auxPath = getRandomPath(rclPaths);
@@ -72,6 +74,9 @@ public class GRASPMain {
 			
 			copyOfP.remove(auxPath);
         }
+        
+        long endTrivial = System.currentTimeMillis();
+        System.out.println("Elapsed time for trivial: "+(endTrivial-startTimeMain));
         
         if(reroutingPath==null){
             System.out.println("trivial case failed");
@@ -127,6 +132,9 @@ public class GRASPMain {
             }
         }
         
+        long endHalfHard=System.currentTimeMillis();
+        System.out.println("time elapsed for Half Hard:"+(endHalfHard-endTrivial));
+        
         if(reroutingPath==null){
             System.out.println("Half hard failed");
             
@@ -149,6 +157,10 @@ public class GRASPMain {
                 copyOfP.remove(auxPath);
             }
         }
+        
+        long endHard=System.currentTimeMillis();
+        System.out.println("time elapsed for Hard:"+(endHard-endHalfHard));
+        System.out.println("total time:"+(endHard-startTimeMain));
     }
     
     static Function<Path, Boolean> numberOfHops = new Function<Path, Boolean>() {
