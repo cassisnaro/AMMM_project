@@ -30,10 +30,21 @@ public class GRASPMain {
     public static int numIterations = 10;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-    	while (numIterations > 0 && Transfer.getTotalReschedules() != 0) {
+    	long startTimeMain = System.currentTimeMillis();
+    	
+    	while (numIterations > 0) {
     		grasp();
+    		
+    		if (Transfer.getTotalReschedules() == 0) {
+    			break;
+    		}
+    		
     		numIterations--;
     	}
+    	
+    	long endTimeMain=System.currentTimeMillis();
+        System.out.println("-----------total time enlapsed: "+(endTimeMain-startTimeMain));
+        System.out.println("-----------Final reschedules needed: "+Transfer.getTotalReschedules());
     }
     
     public static void grasp() throws IOException, URISyntaxException {
