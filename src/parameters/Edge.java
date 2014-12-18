@@ -76,7 +76,7 @@ public class Edge {
 
     public Set<Integer> workOnSegment(Integer minSlice, Integer maxSlice, int extraSlicesNeeded){
         Set<Integer> impossibleSlicesForEdge=new HashSet<>();
-        ReschedulePair reschedulePair = null;
+
         for (Transfer t : transfers){
             if(minSlice > t.getFirstSlice() && t.getLastSlice() > maxSlice){
                 impossibleSlicesForEdge.addAll(t.getCurrentSlices());
