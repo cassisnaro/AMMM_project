@@ -7,6 +7,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import utils.PathComparator;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 public class GRASPMain {
     private static int slicesNeeded;
     private static PrecomputePathsWithTransmissions getP;
@@ -16,7 +24,7 @@ public class GRASPMain {
     private static Set<Edge> E;
     private static Graph G;
     private static RequestedTransfer reqT;
-
+    public static int costFunctionValue = -1;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         ReadWithScanner parser = new ReadWithScanner();
@@ -38,11 +46,19 @@ public class GRASPMain {
         P = getP.getPaths();
 
         Path reroutingPath=null;
-        for (Path p : P) {
-            E = G.getEdges();
+        
+        List<Path> copyOfP = new ArrayList<Path>(P);
+        List<Path> rclPaths = null;
+		Path auxPath = null;
+        
+        while (copyOfP.size() != 0) {
+        	rclPaths = getRCLPaths(copyOfP);
+			auxPath = getRandomPath(rclPaths);
+			
+			E = G.getEdges();
             Collection<Integer> S = new LinkedHashSet<>(allSlices);
             for (Edge e : E) {
-                if (p.hasEdge(e)) {
+                if (auxPath.hasEdge(e)) {
                     S = e.getFreeSlices(S);
                     System.out.println(e.getSource() + " " + e.getDestination());
                 }
@@ -50,17 +66,29 @@ public class GRASPMain {
             int maxContinous = maxContinuity(S);
             if (maxContinous>=slicesNeeded){
                 System.out.println("can be route over this path without rescheduling");
-                reroutingPath=p;
+                reroutingPath=auxPath;
                 break;
             }
+			
+			copyOfP.remove(auxPath);
         }
+        
         if(reroutingPath==null){
             System.out.println("trivial case failed");
-            for (Path p : P) {
-                E = G.getEdges();
+            
+            copyOfP = new ArrayList<Path>(P);
+            rclPaths = null;
+            auxPath = null;
+            costFunctionValue = -1;
+            
+            while (copyOfP.size() != 0) {
+            	rclPaths = getRCLPaths(copyOfP);
+    			auxPath = getRandomPath(rclPaths);
+    			
+    			E = G.getEdges();
                 Collection<Integer>S = new LinkedHashSet<>(allSlices);
                 for (Edge e : E) {
-                    if (p.hasEdge(e)) {
+                    if (auxPath.hasEdge(e)) {
                         S = e.getFreeSlices(S);
                         System.out.println(e.getSource() + " " + e.getDestination());
                     }
@@ -75,7 +103,7 @@ public class GRASPMain {
                         if(previousSlice+1==slice){
                             previousSlice=slice;
                         }else{
-                            boolean reschedulePossible= halfHardReschedulePossible(p, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded);
+                            boolean reschedulePossible= halfHardReschedulePossible(auxPath, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded);
                             if (reschedulePossible){
                                 System.out.println("one path found");
                                 break;
@@ -87,27 +115,87 @@ public class GRASPMain {
                 }
                 /*Test with the last free range of the list*/
                 if(previousSlice!=-1) {
-                    boolean reschedulePossible = halfHardReschedulePossible(p, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded);
+                    boolean reschedulePossible = halfHardReschedulePossible(auxPath, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded);
                     if (reschedulePossible) {
                         System.out.println("one path found, half hard");
-                        reroutingPath = p;
+                        reroutingPath = auxPath;
                         break;
                     }
                 }
+                
+                copyOfP.remove(auxPath);
             }
         }
+        
         if(reroutingPath==null){
             System.out.println("Half hard failed");
-            for (Path p : P) {
-                boolean reschedulePossible =hardReschedulePossible(p, slicesNeeded);
+            
+            copyOfP = new ArrayList<Path>(P);
+            rclPaths = null;
+            auxPath = null;
+            costFunctionValue = -1;
+            
+            while (copyOfP.size() != 0) {
+            	rclPaths = getRCLPaths(copyOfP);
+    			auxPath = getRandomPath(rclPaths);
+    			
+    			boolean reschedulePossible =hardReschedulePossible(auxPath, slicesNeeded);
                 if (reschedulePossible) {
                     System.out.println("one path found, half hard");
-                    reroutingPath = p;
+                    reroutingPath = auxPath;
                     break;
                 }
+                
+                copyOfP.remove(auxPath);
             }
         }
     }
+    
+    static Function<Path, Boolean> numberOfHops = new Function<Path, Boolean>() {
+	    @Override
+	    public Boolean apply(Path p) {
+	        return p.getPath().size() <= costFunctionValue;
+	    }
+	};
+	
+	public static List<Path> getRCLPaths(List<Path> paths) {
+		double alpha = 0.3;
+		
+		List<Path> sortedPaths = new ArrayList<Path>(paths);
+		sortedPaths.sort(new PathComparator());
+		
+//		System.out.println("################## SORTED PATHS");
+//		for (Path p : sortedPaths) {
+//			System.out.println(p.toString());
+//		}
+		
+		int qmin = sortedPaths.get(0).getPath().size();
+		int qmax = sortedPaths.get(sortedPaths.size() - 1).getPath().size();	
+		
+		costFunctionValue = (int) Math.ceil((double)qmin + alpha * ((double)qmax - (double)qmin));
+		
+		Predicate<Path> rclPathsPredicate = Predicates.compose(Predicates.equalTo(true), numberOfHops);
+		
+		Iterable<Path> itRCLPaths = Iterables.filter(sortedPaths, rclPathsPredicate);
+		
+		List<Path> rclPaths = Lists.newArrayList(itRCLPaths);
+		
+		return rclPaths;
+	}
+	
+	public static Path getRandomPath(List<Path> paths) {
+		Random random = new Random();
+		int randomPos;
+		
+		if (paths.size() != 1) {
+			randomPos = random.nextInt(paths.size() - 1);
+		}
+		else {
+			randomPos = 0;
+		}
+		
+		return paths.get(randomPos);
+	}
 
     static private boolean halfHardReschedulePossible(Path path, int firstSlice, int lastSlice, int minBitRate){
         int extraSlicesNeeded=minBitRate-(lastSlice-firstSlice);
