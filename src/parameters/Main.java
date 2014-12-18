@@ -21,6 +21,8 @@ public class Main {
     private static RequestedTransfer reqT;
     private static int nrR = 0;
     private static TransferCollections transferCollections;
+    private static Path reroutingPath=null;
+    private static Collection<Integer> availableSlicesAfterReschedule=null;
 
 
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -46,7 +48,9 @@ public class Main {
         getP.precumputePathsFromTransmission(source, destination);
         P = getP.getPaths();
 
-        Path reroutingPath=null;
+
+
+        long startTimeMain = System.currentTimeMillis();
         for (Path p : P) {
             E = G.getEdges();
             Collection<Integer> S = new LinkedHashSet<>(allSlices);
@@ -63,6 +67,8 @@ public class Main {
                 break;
             }
         }
+        long endTrivial = System.currentTimeMillis();
+        System.out.println("Elapsed time for trivial: "+(endTrivial-startTimeMain));
         if(reroutingPath==null){
             System.out.println("trivial case failed");
             for (Path p : P) {
@@ -110,6 +116,8 @@ public class Main {
                 }
             }
         }
+        long endHalfHard=System.currentTimeMillis();
+        System.out.println("time elapsed for Half Hard:"+(endHalfHard-endTrivial));
         if(reroutingPath==null){
             System.out.println("Half hard failed");
             for (Path p : P) {
@@ -124,6 +132,9 @@ public class Main {
                 }
             }
         }
+        long endHard=System.currentTimeMillis();
+        System.out.println("time elapsed for Hard:"+(endHard-endHalfHard));
+        System.out.println("total time:"+(endHard-startTimeMain));
     }
 
     static private boolean halfHardReschedulePossible(Path path, int firstSlice, int lastSlice, int minBitRate){
@@ -149,13 +160,16 @@ public class Main {
         }
         System.out.println();
         int maxContinuity=maxContinuity(availableSlices);
-        localSearch(availableSlices, minBitRate);
-        return (maxContinuity>=minBitRate);
+        boolean found= (maxContinuity>=minBitRate);
+        if (found){
+            availableSlicesAfterReschedule=availableSlices;
+        }
+        return found;
     }
 
-    static private void localSearch(Collection<Integer> availableSlices, int min_slices){
-        int possibilities=availableSlices.size()-min_slices;
-        ArrayList<Integer> arrayAvailableSlices=new ArrayList<>(availableSlices);
+    static private void localSearch( int min_slices){
+        int possibilities=availableSlicesAfterReschedule.size()-min_slices;
+        ArrayList<Integer> arrayAvailableSlices=new ArrayList<>(availableSlicesAfterReschedule);
         int maxUndo=-1;
         for(int i=0; i<=possibilities;i++){
             boolean continous=true;
@@ -229,9 +243,8 @@ public class Main {
                         }
                         System.out.println();
                         int maxContinuity=maxContinuity(availableSlices);
-                        //TODO transform into something
                         if (maxContinuity>=minBitRate){
-                            System.out.println("Found");
+                            availableSlicesAfterReschedule=availableSlices;
                             return true;
                         }else{
                             Transfer.resetReschedules();
@@ -254,6 +267,7 @@ public class Main {
                 int maxContinuity = maxContinuity(availableSlices);
                 if (maxContinuity >= minBitRate) {
                     System.out.println("Found");
+                    availableSlicesAfterReschedule=availableSlices;
                     return true;
                 }else{
                     Transfer.resetReschedules();
@@ -288,6 +302,7 @@ public class Main {
                                         maxContinuity = maxContinuity(availableSlices2);
                                         if (maxContinuity >= slicesNeeded) {
                                             System.out.println("one path found");
+                                            availableSlicesAfterReschedule=availableSlices2;
                                             return true;
                                         }else{
                                             System.out.println("reset");
@@ -306,6 +321,7 @@ public class Main {
                                 maxContinuity = maxContinuity(availableSlices2);
                                 if (maxContinuity >= slicesNeeded) {
                                     System.out.println("one path found");
+                                    availableSlicesAfterReschedule=availableSlices2;
                                     return true;
                                 }else{
                                     System.out.println("reset");
