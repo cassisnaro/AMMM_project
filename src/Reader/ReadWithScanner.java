@@ -26,7 +26,7 @@ public class ReadWithScanner {
         File fileParent= new File(System.getProperty("user.dir"));
 //		fFilePath = new File(fileParent,"inputTestHard.txt");
 
-        fFilePath = new File(fileParent,"inputTestHardAndHalfHard.txt");
+        fFilePath = new File(fileParent,"inputTestHalfHard.txt");
 		processReadLineByLine();
 	}
 
