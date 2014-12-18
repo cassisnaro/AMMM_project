@@ -186,8 +186,8 @@ public class Main {
                 }
             }
             if (continous) {
-                ArrayList<Integer> tryWith = new ArrayList<>(arrayAvailableSlices.subList(0, i));
-                tryWith.addAll(arrayAvailableSlices.subList(i, i + min_slices - 1));
+                ArrayList<Integer> tryWith = new ArrayList<>(availableSlicesAfterReschedule);
+                tryWith.removeAll(arrayAvailableSlices.subList(i, i + min_slices));
                 int currentUndo = howManyUndoes(tryWith);
                 if (currentUndo > maxUndo) maxUndo = currentUndo;
             }
