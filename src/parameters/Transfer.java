@@ -49,7 +49,7 @@ public class Transfer {
     }
 
     public boolean canUndoReschedule(Collection<Integer> againFree){
-        if (tmpSlices==null) return false;
+        if (tmpSlices==null || transferRescheduled.contains(this)) return false;
         Set<Integer> availableSlices=new HashSet<>(tmpSlices);
         availableSlices.addAll(againFree);
         return availableSlices.containsAll(currentSlices);
@@ -140,6 +140,8 @@ public class Transfer {
         int first_slice=(int)currentSlices.toArray()[0];
         int last_slice=(int)currentSlices.toArray()[currentSlices.size()-1];
         boolean toTheRight=true;
+
+        if(extraSlicesNeeded<0) extraSlicesNeeded=0;
 
         if (first_slice<minPos && minPos<last_slice) {
             toTheRight=false;

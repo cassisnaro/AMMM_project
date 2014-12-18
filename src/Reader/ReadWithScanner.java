@@ -25,10 +25,10 @@ public class ReadWithScanner {
 	public ReadWithScanner() throws URISyntaxException, IOException {
         File fileParent= new File(System.getProperty("user.dir"));
 //		fFilePath = new File(fileParent,"inputTestHard.txt");
-        fFilePath = new File(fileParent,"inputTestHardAndTrivial.txt");
+        fFilePath = new File(fileParent,"inputTestCombinationIntersectionsSegments.txt");
 		processReadLineByLine();
 	}
-	
+
 	public void printGraph() {
 		System.out.println("Grafo: " + graph.toString());
 	}
