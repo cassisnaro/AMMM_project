@@ -7,6 +7,7 @@ import java.util.*;
  */
 public class Transfer {
     static int totalReschedules=0;
+    static Set<Transfer> transferRescheduled=new HashSet<>();
     int transferIdentifier;
     int node_origin;
     int node_destination;
@@ -32,11 +33,22 @@ public class Transfer {
     }
 
     public static void resetReschedules(){
+        transferRescheduled.clear();
         totalReschedules=0;
     }
 
-    private static void addReschedule(){
-        totalReschedules++;
+    private static void addReschedule(Transfer transfer){
+        if (!transferRescheduled.contains(transfer)) {
+            totalReschedules++;
+            transferRescheduled.add(transfer);
+        }
+    }
+
+    public boolean canUndoReschedule(Collection<Integer> againFree){
+        if (tmpSlices==null) return false;
+        Set<Integer> availableSlices=new HashSet<>(tmpSlices);
+        availableSlices.addAll(againFree);
+        return availableSlices.containsAll(currentSlices);
     }
 
     public Set<Integer> getCurrentSlices() {
@@ -85,7 +97,7 @@ public class Transfer {
         for(int i=from; i<=to; i++){
             tmpSlices.add(new Integer(i));
         }
-        addReschedule();
+        addReschedule(this);
     }
     public void setTemporarySlices2(int from, int to){
         if (tmpSlices2==null){
@@ -124,7 +136,15 @@ public class Transfer {
         int first_slice=(int)currentSlices.toArray()[0];
         int last_slice=(int)currentSlices.toArray()[currentSlices.size()-1];
         boolean toTheRight=true;
-        if(last_slice<minPos) toTheRight=false;
+
+        if (first_slice<minPos && minPos<last_slice) {
+            toTheRight=false;
+        } else if (first_slice<maxPos && maxPos<last_slice){
+            toTheRight=true;
+        } else if(last_slice<minPos){
+            toTheRight=false;
+        }
+
         if(toTheRight){
             if(maxPos+extraSlicesNeeded>=first_slice) {
                 setTemporarySlices(first_slice + spaceAbleToFree, last_slice);

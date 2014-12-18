@@ -24,6 +24,8 @@ public class Main {
 
 
     public static void main(String[] args) throws IOException, URISyntaxException {
+
+
         ReadWithScanner parser = new ReadWithScanner();
         System.out.println("Parser started.");
         reqT = parser.getRequestedTransfer();
@@ -100,6 +102,7 @@ public class Main {
                     if (reschedulePossible) {
                         System.out.println("one path found, half hard");
                         reroutingPath = p;
+                        System.out.println("It needs: "+Transfer.getTotalReschedules()+" reschedules");
                         break;
                     }else{
                         Transfer.resetReschedules();
@@ -146,7 +149,45 @@ public class Main {
         }
         System.out.println();
         int maxContinuity=maxContinuity(availableSlices);
+        localSearch(availableSlices, minBitRate);
         return (maxContinuity>=minBitRate);
+    }
+
+    static private void localSearch(Collection<Integer> availableSlices, int min_slices){
+        int possibilities=availableSlices.size()-min_slices;
+        ArrayList<Integer> arrayAvailableSlices=new ArrayList<>(availableSlices);
+        int maxUndo=-1;
+        for(int i=0; i<=possibilities;i++){
+            boolean continous=true;
+            for(int j=0; j<min_slices-1; j++){
+                if (arrayAvailableSlices.get(i+j)+1!=arrayAvailableSlices.get(i+j+1)){
+                    continous=false;
+                    break;
+                }
+            }
+            if (continous) {
+                ArrayList<Integer> tryWith = new ArrayList<>(arrayAvailableSlices.subList(0, i));
+                tryWith.addAll(arrayAvailableSlices.subList(i, i + min_slices - 1));
+                int currentUndo = howManyUndoes(tryWith);
+                if (currentUndo > maxUndo) maxUndo = currentUndo;
+            }
+        }
+        System.out.println("detected "+maxUndo+" possible undoes");
+
+    }
+
+    static private int howManyUndoes(Collection<Integer> availableSlices){
+        HashSet<Transfer> analyzedTransfers= new HashSet<>();
+        int count=0;
+        for(Edge e:E){
+            for(Transfer t:e.getTransfers()){
+                if (!analyzedTransfers.contains(t)){
+                    analyzedTransfers.add(t);
+                    if (t.canUndoReschedule(availableSlices)) count++;
+                }
+            }
+        }
+        return count;
     }
 
     static private boolean hardReschedulePossible(Path path, int minBitRate){
@@ -226,8 +267,8 @@ public class Main {
             for(Integer intersection:transmissionsIntersections){
                 System.out.println("\tintersection:"+intersection.toString());
                 for (Edge e : E) {
-                    Collection<Integer> availableSlices = new LinkedHashSet<>(allSlices);
                     if (path.hasEdge(e)) {
+                        Collection<Integer> availableSlices = new LinkedHashSet<>(allSlices);
                         availableSlices.removeAll(e.workOnTransferIntersection(intersection-1, slicesNeeded));
                         int maxContinuity = maxContinuity(availableSlices);
                         if (maxContinuity >= slicesNeeded) {
@@ -249,6 +290,7 @@ public class Main {
                                             System.out.println("one path found");
                                             return true;
                                         }else{
+                                            System.out.println("reset");
                                             Transfer.resetReschedules();
                                         }
                                         firstSliceCurrentFreeSpace = slice;
@@ -266,7 +308,9 @@ public class Main {
                                     System.out.println("one path found");
                                     return true;
                                 }else{
+                                    System.out.println("reset");
                                     Transfer.resetReschedules();
+                                    break;
                                 }
                             }
                         }
@@ -274,7 +318,7 @@ public class Main {
                 }
             }
         }
-        System.out.println("Failed with segments");
+        System.out.println("Failed with intersections");
         return false;
     }
 
