@@ -27,8 +27,16 @@ public class GRASPMain {
     private static Path reroutingPath=null;
     private static Collection<Integer> availableSlicesAfterReschedule=null;
     public static int costFunctionValue = -1;
+    public static int numIterations = 10;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
+    	while (numIterations > 0 && Transfer.getTotalReschedules() != 0) {
+    		grasp();
+    		numIterations--;
+    	}
+    }
+    
+    public static void grasp() throws IOException, URISyntaxException {
     	ReadWithScanner parser = new ReadWithScanner();
         System.out.println("Parser started.");
         reqT = parser.getRequestedTransfer();
@@ -168,7 +176,13 @@ public class GRASPMain {
         
         long endHard=System.currentTimeMillis();
         System.out.println("time elapsed for Hard:"+(endHard-endHalfHard));
-        System.out.println("total time:"+(endHard-startTimeMain));
+        if (Transfer.getTotalReschedules()>0){
+            localSearch(slicesNeeded);
+        }
+        long endLocalSearch=System.currentTimeMillis();
+        System.out.println("time elapsed for localSearch: "+(endLocalSearch-endHard));
+        System.out.println("total time: "+(endHard-startTimeMain));
+        System.out.println("Final reschedules needed: "+Transfer.getTotalReschedules());
     }
     
     static Function<Path, Boolean> numberOfHops = new Function<Path, Boolean>() {
@@ -247,7 +261,7 @@ public class GRASPMain {
         return found;
     }
 
-    static private void localSearch( int min_slices){
+	static private void localSearch( int min_slices){
         int possibilities=availableSlicesAfterReschedule.size()-min_slices;
         ArrayList<Integer> arrayAvailableSlices=new ArrayList<>(availableSlicesAfterReschedule);
         int maxUndo=-1;
@@ -266,7 +280,7 @@ public class GRASPMain {
                 if (currentUndo > maxUndo) maxUndo = currentUndo;
             }
         }
-        System.out.println("detected "+maxUndo+" possible undoes");
+        Transfer.undoReschedules(maxUndo);
 
     }
 
