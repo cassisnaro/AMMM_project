@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class Transfer {
     static int totalReschedules=0;
-    static Set<Transfer> transferRescheduled=new HashSet<>();
+    static Set<Transfer> transferRescheduled = new HashSet<>();
     int transferIdentifier;
     int node_origin;
     int node_destination;
@@ -49,7 +49,8 @@ public class Transfer {
     }
 
     public boolean canUndoReschedule(Collection<Integer> againFree){
-        if (tmpSlices==null || transferRescheduled.contains(this)) return false;
+        if (tmpSlices==null) return false;
+        if (!Transfer.transferRescheduled.contains(this)) return false;
         Set<Integer> availableSlices=new HashSet<>(tmpSlices);
         availableSlices.addAll(againFree);
         return availableSlices.containsAll(currentSlices);

@@ -48,23 +48,23 @@ public class GRASPMain {
     }
     
     public static void grasp() throws IOException, URISyntaxException {
-    	 ReadWithScanner parser = new ReadWithScanner();
-         System.out.println("Parser started.");
-         reqT = parser.getRequestedTransfer();
-         String source = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_origin());
-         String destination = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_destination());
-         int data = reqT.getData_amount();
-         int timeComp = reqT.getTime_completion();
-         slicesNeeded = (int) Math.ceil((double) data / (double) timeComp);
-         System.out.format("Requested Transfer: s: %s, d: %s, data: %d, time: %d, slicesNeeded: %d\n", source, destination, data, timeComp, slicesNeeded);
-         numSlices = parser.getNumSlices();
-         for (int j = 0; j < numSlices; j++) {
-             allSlices.add(j);
-         }
-         G = parser.getGraph();
-         getP = new PrecomputePathsWithTransmissions(G);
-         getP.precumputePathsFromTransmission(source, destination);
-         P = getP.getPaths();
+    	ReadWithScanner parser = new ReadWithScanner();
+        System.out.println("Parser started.");
+        reqT = parser.getRequestedTransfer();
+        String source = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_origin());
+        String destination = parser.getGraph().getNodeNameFromIdentifier(reqT.getNode_destination());
+        int data = reqT.getData_amount();
+        int timeComp = reqT.getTime_completion();
+        slicesNeeded = (int) Math.ceil((double) data / (double) timeComp);
+        System.out.format("Requested Transfer: s: %s, d: %s, data: %d, time: %d, slicesNeeded: %d\n", source, destination, data, timeComp, slicesNeeded);
+        numSlices = parser.getNumSlices();
+        for (int j = 0; j < numSlices; j++) {
+            allSlices.add(j);
+        }
+        G = parser.getGraph();
+        getP = new PrecomputePathsWithTransmissions(G);
+        getP.precumputePathsFromTransmission(source, destination);
+        P = getP.getPaths();
         
         List<Path> copyOfP = new ArrayList<Path>(P);
         List<Path> rclPaths = null;
@@ -285,8 +285,8 @@ public class GRASPMain {
                 }
             }
             if (continous) {
-                ArrayList<Integer> tryWith = new ArrayList<>(arrayAvailableSlices.subList(0, i));
-                tryWith.addAll(arrayAvailableSlices.subList(i, i + min_slices - 1));
+                ArrayList<Integer> tryWith = new ArrayList<>(availableSlicesAfterReschedule);
+                tryWith.removeAll(arrayAvailableSlices.subList(i, i + min_slices));
                 int currentUndo = howManyUndoes(tryWith);
                 if (currentUndo > maxUndo) maxUndo = currentUndo;
             }
