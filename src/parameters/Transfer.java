@@ -117,7 +117,9 @@ public class Transfer {
         int first_slice=(int)currentSlices.toArray()[0];
         int last_slice=(int)currentSlices.toArray()[currentSlices.size()-1];
         boolean toTheRight=true;
-        if(last_slice<minPos) toTheRight=false;
+        if(last_slice<minPos) {
+        	toTheRight=false;
+        }
         if(toTheRight){
             if(maxPos+extraSlicesNeeded>=first_slice) {
                 setTemporarySlices(first_slice + spaceAbleToFree, last_slice);

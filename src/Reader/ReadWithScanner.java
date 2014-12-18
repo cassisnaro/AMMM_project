@@ -25,7 +25,7 @@ public class ReadWithScanner {
 	public ReadWithScanner() throws URISyntaxException, IOException {
         File fileParent= new File(System.getProperty("user.dir"));
 //		fFilePath = new File(fileParent,"inputTestHard.txt");
-        fFilePath = new File(fileParent,"input_gaby_v1.txt");
+        fFilePath = new File(fileParent,"inputTestIntersections.txt");
 		processReadLineByLine();
 	}
 	
