@@ -44,6 +44,10 @@ public class Transfer {
         }
     }
 
+    public static void undoReschedules(int undoes){
+        totalReschedules -= undoes;
+    }
+
     public boolean canUndoReschedule(Collection<Integer> againFree){
         if (tmpSlices==null) return false;
         Set<Integer> availableSlices=new HashSet<>(tmpSlices);

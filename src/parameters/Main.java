@@ -134,7 +134,13 @@ public class Main {
         }
         long endHard=System.currentTimeMillis();
         System.out.println("time elapsed for Hard:"+(endHard-endHalfHard));
-        System.out.println("total time:"+(endHard-startTimeMain));
+        if (Transfer.getTotalReschedules()>0){
+            localSearch(slicesNeeded);
+        }
+        long endLocalSearch=System.currentTimeMillis();
+        System.out.println("time elapsed for localSearch: "+(endLocalSearch-endHard));
+        System.out.println("total time: "+(endHard-startTimeMain));
+        System.out.println("Final reschedules needed: "+Transfer.getTotalReschedules());
     }
 
     static private boolean halfHardReschedulePossible(Path path, int firstSlice, int lastSlice, int minBitRate){
@@ -186,7 +192,7 @@ public class Main {
                 if (currentUndo > maxUndo) maxUndo = currentUndo;
             }
         }
-        System.out.println("detected "+maxUndo+" possible undoes");
+        Transfer.undoReschedules(maxUndo);
 
     }
 
