@@ -19,6 +19,7 @@ public class GRASPMain {
     private static int slicesNeeded;
     private static PrecomputePathsWithTransmissions getP;
     private static ArrayList<Path> P;
+    private static ArrayList<Path> visitedPathsInSection=null;
     private static int numSlices;
     private static Collection<Integer> allSlices = new ArrayList<Integer>();
     private static Set<Edge> E;
@@ -28,23 +29,16 @@ public class GRASPMain {
     private static Collection<Integer> availableSlicesAfterReschedule=null;
     public static int costFunctionValue = -1;
     public static int numIterations = 10;
+    public static int min_reschedule;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
     	long startTimeMain = System.currentTimeMillis();
-    	
-    	while (numIterations > 0) {
-    		grasp();
-    		
-    		if (Transfer.getTotalReschedules() == 0) {
-    			break;
-    		}
-    		
-    		numIterations--;
-    	}
+
+        grasp();
     	
     	long endTimeMain=System.currentTimeMillis();
         System.out.println("-----------total time enlapsed: "+(endTimeMain-startTimeMain));
-        System.out.println("-----------Final reschedules needed: "+Transfer.getTotalReschedules());
+        System.out.println("-----------Final reschedules needed: "+min_reschedule);
     }
     
     public static void grasp() throws IOException, URISyntaxException {
@@ -67,12 +61,16 @@ public class GRASPMain {
         P = getP.getPaths();
         
         List<Path> copyOfP = new ArrayList<Path>(P);
+        visitedPathsInSection = new ArrayList<>();
         List<Path> rclPaths = null;
 		Path auxPath = null;
-        
+        min_reschedule = Integer.MAX_VALUE;
+
+
 		long startTimeMain = System.currentTimeMillis();
-		
-        while (copyOfP.size() != 0) {
+
+
+        while (copyOfP.size() != 0 && reroutingPath==null) {
         	rclPaths = getRCLPaths(copyOfP);
 			auxPath = getRandomPath(rclPaths);
 			
@@ -88,6 +86,7 @@ public class GRASPMain {
             if (maxContinous>=slicesNeeded){
                 System.out.println("can be route over this path without rescheduling");
                 reroutingPath=auxPath;
+                min_reschedule = 0;
                 break;
             }
 			
@@ -104,10 +103,15 @@ public class GRASPMain {
             rclPaths = null;
             auxPath = null;
             costFunctionValue = -1;
-            
-            while (copyOfP.size() != 0) {
-            	rclPaths = getRCLPaths(copyOfP);
+
+            visitedPathsInSection.clear();
+            rclPaths = getRCLPaths(copyOfP);
+            while (rclPaths.size() != 0) {
+                System.out.println("-----------Half hard");
+
     			auxPath = getRandomPath(rclPaths);
+                visitedPathsInSection.add(auxPath);
+                rclPaths.remove(auxPath);
     			
     			E = G.getEdges();
                 Collection<Integer>S = new LinkedHashSet<>(allSlices);
@@ -130,7 +134,9 @@ public class GRASPMain {
                             boolean reschedulePossible= halfHardReschedulePossible(auxPath, firstSliceCurrentFreeSpace, previousSlice, slicesNeeded);
                             if (reschedulePossible){
                                 System.out.println("one path found");
-                                break;
+                                localSearch(slicesNeeded);
+                                if (Transfer.getTotalReschedules()<min_reschedule) min_reschedule = Transfer.getTotalReschedules();
+                                Transfer.resetReschedules();
                             }else{
                                 Transfer.resetReschedules();
                             }
@@ -145,8 +151,9 @@ public class GRASPMain {
                     if (reschedulePossible) {
                         System.out.println("one path found, half hard");
                         reroutingPath = auxPath;
-                        System.out.println("It needs: "+Transfer.getTotalReschedules()+" reschedules");
-                        break;
+                        localSearch(slicesNeeded);
+                        if (Transfer.getTotalReschedules()<min_reschedule) min_reschedule = Transfer.getTotalReschedules();
+                        Transfer.resetReschedules();
                     }else{
                         Transfer.resetReschedules();
                     }
@@ -159,41 +166,41 @@ public class GRASPMain {
         long endHalfHard=System.currentTimeMillis();
         System.out.println("time elapsed for Half Hard:"+(endHalfHard-endTrivial));
         
-        if(reroutingPath==null){
-            System.out.println("Half hard failed");
+        if(reroutingPath==null){;
             
             copyOfP = new ArrayList<Path>(P);
             rclPaths = null;
             auxPath = null;
             costFunctionValue = -1;
-            
-            while (copyOfP.size() != 0) {
-            	rclPaths = getRCLPaths(copyOfP);
+
+            visitedPathsInSection.clear();
+            rclPaths = getRCLPaths(copyOfP);
+
+            while (rclPaths.size() != 0) {
+                System.out.println("----------- hard");
     			auxPath = getRandomPath(rclPaths);
+                rclPaths.remove(auxPath);
     			
     			boolean reschedulePossible =hardReschedulePossible(auxPath, slicesNeeded);
                 if (reschedulePossible) {
-                    System.out.println("one path found, half hard");
+                    System.out.println("one path found, from hard to half hard");
                     reroutingPath = auxPath;
                     System.out.println("It needs: "+Transfer.getTotalReschedules()+" reschedules");
-                    break;
+
+                    localSearch(slicesNeeded);
+                    if (Transfer.getTotalReschedules()<min_reschedule) min_reschedule = Transfer.getTotalReschedules();
+                    Transfer.resetReschedules();
                 }else{
                     Transfer.resetReschedules();
                 }
-                
                 copyOfP.remove(auxPath);
             }
         }
-        
-        long endHard=System.currentTimeMillis();
-        System.out.println("time elapsed for Hard:"+(endHard-endHalfHard));
-        if (Transfer.getTotalReschedules()>0){
-            localSearch(slicesNeeded);
-        }
-        long endLocalSearch=System.currentTimeMillis();
-        System.out.println("time elapsed for localSearch: "+(endLocalSearch-endHard));
-        System.out.println("total time: "+(endHard-startTimeMain));
-        System.out.println("Final reschedules needed: "+Transfer.getTotalReschedules());
+
+
+//        System.out.println("time elapsed for localSearch: "+(endLocalSearch-endHard));
+//        System.out.println("total time: "+(endHard-startTimeMain));
+        System.out.println("Final reschedules needed: "+min_reschedule);
     }
     
     static Function<Path, Boolean> numberOfHops = new Function<Path, Boolean>() {
@@ -208,6 +215,8 @@ public class GRASPMain {
 		
 		List<Path> sortedPaths = new ArrayList<Path>(paths);
 		sortedPaths.sort(new PathComparator());
+
+        sortedPaths.removeAll(visitedPathsInSection);
 		
 //		System.out.println("################## SORTED PATHS");
 //		for (Path p : sortedPaths) {

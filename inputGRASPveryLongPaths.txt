@@ -1,0 +1,20 @@
+S
+6
+N
+a b c d e f g h i j
+G
+(a,b,1) (b,e,1) (e,f,1) (f,g,1) (g,h,1) (h,i,1) (i,j,1) (j,c,1) (a,d,1) (d,c,1) (a,c,1)
+T1
+a b e f g h i j c / 2 6 0 3 2
+T2
+b e / 2 2 4 5 2
+T3
+a d c / 2 2 0 3 2
+T4
+d c / 2 2 4 5 2
+T3
+a c / 2 6 0 3 2
+T4
+a c / 2 2 4 5 2
+RT
+a c 2 3
