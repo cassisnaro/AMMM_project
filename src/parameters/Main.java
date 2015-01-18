@@ -27,7 +27,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
 
-
+        long startTime = System.currentTimeMillis();
         ReadWithScanner parser = new ReadWithScanner();
         System.out.println("Parser started.");
         reqT = parser.getRequestedTransfer();
@@ -48,6 +48,7 @@ public class Main {
         getP.precumputePathsFromTransmission(source, destination);
         P = getP.getPaths();
 
+        System.out.println("Elapsed at the beginning: "+(System.currentTimeMillis()-startTime));
 
 
         long startTimeMain = System.currentTimeMillis();
@@ -139,7 +140,7 @@ public class Main {
         }
         long endLocalSearch=System.currentTimeMillis();
         System.out.println("time elapsed for localSearch: "+(endLocalSearch-endHard));
-        System.out.println("total time: "+(endHard-startTimeMain));
+        System.out.println("total time: "+(endHard-startTime));
         System.out.println("Final reschedules needed: "+Transfer.getTotalReschedules());
     }
 
