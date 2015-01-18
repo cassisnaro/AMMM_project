@@ -24,7 +24,7 @@ public class ReadWithScanner {
 
 	public ReadWithScanner() throws URISyntaxException, IOException {
         File fileParent= new File(System.getProperty("user.dir"));
-		fFilePath = new File(fileParent,"inputGRASPveryLongPaths.txt");
+		fFilePath = new File(fileParent,"inputSeeDifferencesGreedyCplex.txt");
 		processReadLineByLine();
 	}
 
