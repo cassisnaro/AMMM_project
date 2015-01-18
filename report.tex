@@ -67,8 +67,27 @@ $+ \sum_{a \in a} \sum_{p \in P} \delta_{as} * \gamma_{at} * \rho_{pe} * x_{ap} 
 
 The first constraint guarantees that the transfer request is served with route $p$ and rectangle $a$. Then we select the feasible rectangles for the ongoing transferences with the next three constraints. After words, with the sixth constraint we decide whether a transference needs to be reallocated or not and the last constraint guarantees that there are no links used by more than one constraint for each time interval. We have implemented and tested our ILP model with the ILOG CPLEX studio.
 
-\section{Metaheuristic 1}
-\section{Metaheuristic 2}
+\section{Metaheuristic Algorithms}
+
+To solve the spectrum allocation problem use the Greedy and GRASP algorithms. Initially we develop a programm to precompute all the available paths in the graph between source and destination nodes of the requested transfer using Breadth-first search. These paths are the candidates in our set $C$. Next, we have divided the search for a feasible solution in three main parts: Trivial Case, Half Hard Case and Hard Case, and we analyze in which category the addition of this new transfer falls into.\\
+
+A trivial case, showed in Fig. 1, happens when adding a new transfer into the network does not require the rescheduling of any of the other scheduled ongoing transfers, because the required number of free slices is already available.
+
+\includegraphics[scale=1]{trivialcase.jpg}
+
+The half hard case, Fig. 2, implies evaluating the possibility of adding a new transfer into the network, but only some slices are currently available, but not enough. In this case it is necessary to check on each link, all of the ongoing transferences, and see if they can be rearranged to inclease the time it takes to end the transaction, while still maintaining the completion time constraint, consequently freeing up some slices for the requested transfer. We first check if “squeezing” the left transfer to the left we have enough space, if not we try “squeezing” the right transfer to the right and check again if we have freed all the slices needed by the new transfer. 
+
+\includegraphics[scale=1]{halfhardcase.jpg}
+
+When we do not have any free slices available in any link throughout the selected path, we have a hard case, Fig. 3. Adding a new transfer into the network requires all of the necessary slices to be freed. In this particular case, we have to perform the same “squeezing” procedure specified in the previous case, but first we have to check each intersection point between two ongoing transferences to select a starting point where we can insert the new transfer that needs to be scheduled. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there. Once an insertion point, suitable on all links is found, we start performing the reschedulings.
+
+\includegraphics[scale=1]{hardcase.jpg}
+
+ \subsection{Greedy}
+ 
+ \subsection{GRASP}
+
+
 \section{Results}
 \section{Conclusion}
 \end{document}
