@@ -8,7 +8,7 @@
 \begin{document}
 \maketitle
 \section{Introduction}
-% to do: maybe add an example? make references and label sections
+% to do: will add references at the end
 
 For our project we implemented the integer linear programming model described in the paper "Managing Transfer-Based Datacenter Connections" by Adrian Asensio and Luis Velasco. In order to accommodate spikes in cloud demand, while managing the energy consumption of datacenters, it is necessary for datacenter federations to be created. When building large infrastructures cloud operators, with the help of these federations, are capable of reducing capital expenditures by having a dinamic cloud service that uses under-utilized resources in remote datacenters. These dinamic cloud services the huge energy consumption in remote datacenters are minimized, because servers can be turned on and off as needed. To implement these sort of elastic operations, cloud computing strongly depends on the interconnected datacenters through a network providing huge capacity and having the necessary resources available. The interdatacenter traffic results from workloads being encapsulated in virtual machines and moved on different datacenters. Because the amount of data that needs to be transferred is in a huge volume, these features can be covered with a flexgrid optical network, i.e. resource managers can set up and tear down connections of the necessary bitrate only for the amount of time needed to transfer the data. For each of these connections, the frequency slot, i.e. spectrum width, depends on the bandwidth requested and the used modulation format. Elastic connections were suggested due to the fact that not enough resources might be available at the request time, so the manager can dynamically modify the spectrum allocated (RSSA problem) to ongoing transferences and the requested connection to accomodate all traffic and complete it in the requested time. These elastic connections are possible through programmable bandwidth-variable transponders that can provide optical signals of different characteristics.\\
 
@@ -20,36 +20,40 @@ The rest of our project report is structured as follows. We present the integer 
 
 In order to simplify the RSSA problem, we limited our project to only one new transfer being requested. We have a network topology represented by a graph $G(L,E)$ with a set of locations ($L$) and set of fiber connections ($E$). We are given a subset ($D$) of the datacenters' locations, the characteristics for each fiber connection, i.e. a set $S$ of available spectrum slices, and the capacity and number of flows of the optical transponders at each location. The set $R$ contains the ongoing transferences, and origin ($o_{r}$), destination ($d_{r}$), the remaining amount of data ($v_{r}$) to be transferred, the requested completion time ($c_{r}$), the route ($r_{r}$) and slot currently allocated ($s^{0}_{r}$), the scheduled slot allocation ($s^{1}_{r}$) to be performed at time $t^{1}_{r}$, and the scheduled completion time ($t_{r}$) for each transfer in the tuple $\{o_{r}; d_{r}; v_{r}; c_{r}; r_{r}; s^{0}_{r} ; s^{1}_{r} ; t^{1}_{r} ; t_{r}\}$. The details of the new transfer request are given in the tuple $\{o_{r}; d_{r}; v_{r}; c_{r}\}$. The output of our model is the route allocated ($r_{r}$), scheduled completion time ($t_{r}$), bitrate of the connection ($s^{0}_{r}$), the new spectrum allocation ($w^{0}_{r}$), scheduled reallocation ($w^{1}_{r}$, $t^{1}_{r}$), and completion time ($t_{r}$) for each transference request that is rescheduled. Our objective is to minimize the number of connections to be rescheduled to make room for the incoming request.\\
 
-% to do: do we need pseudo code for precomputing?
 A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{r}$ from $t_{0}$ to $t^{1}_{r}$ and $s^{1}_{r}$ from $t^{1}_{r}$ to $t_{r}$, so that the combined area of the two rectangles allows conveying the remaining amount of data $v_{r}$ and $t_{r} \leq  c_{r}$. To decide dimensions, spectrum and time for the ongoing transferences might lead to nonlinear constraints. Because of this we have written a Java program to precompute any feasible combination of rectangles $A_{0}$ and $A_{1}$ for these transfers, with discretizing time into intervals. A set of precomputed rectangles A for the incoming transfer request is also computed, taking into account completion time and amout of data to be transferred.\\
-
-In order to present the ILP model, we define the necessary parameters and variables:\\
-\begin{tabular}{c l}
+In order to present the ILP model, we define the necessary parameters and variables:\\\\
+\begin{table}
 \small
+\begin{tabular}{c l}
 $E$ & set of fiber links in the network, index $e$.\\
 $S$ &  set of frequency slices, index $s$.\\
 $T$ & set of time intervals, index $t$.\\
 $R$ & set of ongoing transferences, index $r$.\\
 $P$ & set of routes between origin and destination for the new request, index $p$.\\
 $A$ & set of candidate areas for the requested trans- ference, index $a$.\\
-$A^{0}_{r}$ & set of candidate areas for transference $r$ between $t_{0}$ and $t^{1}_{r}$ and a spectrum allocation.\\
-$A^{1}_{r}$ & set of candidate areas for transference $r$. between $t_{1}$ and $t_{r}$ and a spectrum allocation.\\
+$A^{0}_{r}$ & set of candidate areas for $r$ between $t_{0}$ and $t^{1}_{r}$ and a spectrum allocation.\\
+$A^{1}_{r}$ & set of candidate areas for $r$ between $t_{1}$ and $t_{r}$ and a spectrum allocation.\\
 $\omega_{ar}$ & 1 if transference r was assigned to area $a$, 0 otherwise.\\
 $\delta_{as}$ & 1 if area a includes slice $s$, 0 otherwise.\\
 $\gamma_{at}$ & 1 if area $a$ includes time interval $t$, 0 otherwise.\\ 
 $\rho_{pe}$ & 1 if route $p$ uses link $e$, 0 otherwise.\\
 $\rho_{re}$ & 1 if transference $r$ uses link $e$, 0 otherwise.\\
 $\beta_{raa'}$ & 1 if pair of areas $a \in A_{0}$ and $a' \in A_{1}$ for transference $r$ is feasible.\\
-$\delta_{kest}$ & 1 if fixed-bitrate connection $k$ uses slice $s$ in link $e$ at time interval $t$, 0 otherwise.\\
+$\delta_{kest}$ & 1 if fixed-bitrate connection $k$ uses slice $s$ in link $e$ at time $t$, 0 otherwise.\\
 $\alpha_{est}$ & 0 if slice $s$ in edge $e$ is used by any fixed-bitrate connection time interval $t$.\\
-\end{tabular}\\
+\end{tabular}
+\end{table}
+\newline
 Variables:\\
+\begin{table}
+\small
 \begin{tabular}{c l}
 $x_{ap}$ & 1 if the new transference is assigned to area $a$ through route $p$.\\
 $y_{r}$ & 1 if transference $r$ is rescheduled, 0 otherwise.\\
 $x^{0}_{ar}$ & 1 if transfer $r$ is assigned to area $a \in A_{0}$.\\
 $x^{1}_{ar}$ & 1 if transfer $r$ is assigned to area $a \in A_{1}$.\\
-\end{tabular}\\\\
+\end{tabular}
+\end{table}
 \newline
 And the ILP model is as follows:\\\\
 $minimize \sum_{r\in R} y_{r} $\\\\
