@@ -42,8 +42,6 @@ $\gamma_{at}$ & 1 if area $a$ includes time interval $t$, 0 otherwise.\\
 $\rho_{pe}$ & 1 if route $p$ uses link $e$, 0 otherwise.\\
 $\rho_{re}$ & 1 if transference $r$ uses link $e$, 0 otherwise.\\
 $\beta_{raa'}$ & 1 if pair of areas $a \in A_{0}$ and $a' \in A_{1}$ for transference $r$ is feasible.\\
-$\delta_{kest}$ & 1 if fixed-bitrate connection $k$ uses slice $s$ in link $e$ at time $t$, 0 otherwise.\\
-$\alpha_{est}$ & 0 if slice $s$ in edge $e$ is used by any fixed-bitrate connection time interval $t$.\\
 \end{tabular}
 \end{table}
 Variables:
@@ -65,7 +63,7 @@ $\sum_{a \in A_{1(r)}}$ $x^{1}_{ar}=1$    $\forall r \in R$\\\\
 $\sum_{a' \in A_{1(r)}}$ $\beta_{raa'}*x^{1}_{a'r} \geq x^{0}_{ar}$     $\forall r \in R,$ $a \in A_{0(r)}$\\\\
 $x^{0}_{ar} - \omega_{ar} \leq y_{r}$     $\forall$ $r \in R,$ $a \in A_{0(r)}$\\\\
 $\sum_{r \in R} \sum_{a \in A_{0(r)}}$ $\delta_{as} * \gamma_{at} * \rho_{re} * x^{0}_{ar} + \sum_{r \in R} \sum_{a \in A_{1(r)}} \delta_{as} * \gamma_{at} * \rho_{re} * x^{1}_{ar}$\\ 
-$+ \sum_{a \in a} \sum_{p \in P} \delta_{as} * \gamma_{at} * \rho_{pe} * x_{ap} \leq \delta_{est}$    $\forall$ $e \in E,$ $s \in S,$ $t \in {\{t^{0},...,T\}}$\\
+$+ \sum_{a \in a} \sum_{p \in P} \delta_{as} * \gamma_{at} * \rho_{pe} * x_{ap} \leq 1$    $\forall$ $e \in E,$ $s \in S,$ $t \in {\{t^{0},...,T\}}$\\
 
 The first constraint guarantees that the transfer request is served with route $p$ and rectangle $a$. Then we select the feasible rectangles for the ongoing transferences with the next three constraints. After words, with the sixth constraint we decide whether a transference needs to be reallocated or not and the last constraint guarantees that there are no links used by more than one constraint for each time interval. We have implemented and tested our ILP model with the ILOG CPLEX studio.
 
