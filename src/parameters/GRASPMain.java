@@ -6,6 +6,7 @@ import dctransfers.PrecomputePathsWithTransmissions;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.SynchronousQueue;
 
 import utils.PathComparator;
 
@@ -42,6 +43,8 @@ public class GRASPMain {
     }
     
     public static void grasp() throws IOException, URISyntaxException {
+
+        long graspStart= System.currentTimeMillis();
     	ReadWithScanner parser = new ReadWithScanner();
         System.out.println("Parser started.");
         reqT = parser.getRequestedTransfer();
@@ -55,24 +58,35 @@ public class GRASPMain {
         for (int j = 0; j < numSlices; j++) {
             allSlices.add(j);
         }
+
+        System.out.println("Checkpoint -2:"+(System.currentTimeMillis()-graspStart));
         G = parser.getGraph();
         getP = new PrecomputePathsWithTransmissions(G);
         getP.precumputePathsFromTransmission(source, destination);
         P = getP.getPaths();
-        
+
+
+        System.out.println("Checkpoint -1:"+(System.currentTimeMillis()-graspStart));
         List<Path> copyOfP = new ArrayList<Path>(P);
         visitedPathsInSection = new ArrayList<>();
-        List<Path> rclPaths = null;
+        List<Path> rclPathsMaster = null;
 		Path auxPath = null;
         min_reschedule = Integer.MAX_VALUE;
 
+        System.out.println("Checkpoint 0:"+(System.currentTimeMillis()-graspStart));
 
 		long startTimeMain = System.currentTimeMillis();
 
 
-        while (copyOfP.size() != 0 && reroutingPath==null) {
-        	rclPaths = getRCLPaths(copyOfP);
+        rclPathsMaster = getRCLPaths(copyOfP);
+
+        List<Path> rclPaths = new ArrayList<>(rclPathsMaster);
+        while (rclPaths.size() != 0 && reroutingPath==null) {
+            long startTimeIter = System.currentTimeMillis();
+
+
 			auxPath = getRandomPath(rclPaths);
+            rclPaths.remove(auxPath);
 			
 			E = G.getEdges();
             Collection<Integer> S = new LinkedHashSet<>(allSlices);
@@ -89,15 +103,19 @@ public class GRASPMain {
                 min_reschedule = 0;
                 break;
             }
-			
-			copyOfP.remove(auxPath);
+
+            long endTimeIter = System.currentTimeMillis();
+            System.out.println("easy iter time: "+(endTimeIter-startTimeIter));
         }
-        
-        long endTrivial = System.currentTimeMillis();
-        System.out.println("Elapsed time for trivial: "+(endTrivial-startTimeMain));
+        long endTimeMain = System.currentTimeMillis();
+        System.out.println("easy time: "+(endTimeMain-startTimeMain));
+
+
+        System.out.println("Checkpoint AFTER EASY :"+(System.currentTimeMillis()-graspStart));
+        startTimeMain = System.currentTimeMillis();
         
         if(reroutingPath==null){
-            System.out.println("trivial case failed");
+            long startTimeIter = System.currentTimeMillis();
             
             copyOfP = new ArrayList<Path>(P);
             rclPaths = null;
@@ -105,7 +123,7 @@ public class GRASPMain {
             costFunctionValue = -1;
 
             visitedPathsInSection.clear();
-            rclPaths = getRCLPaths(copyOfP);
+            rclPaths = new ArrayList<>(rclPathsMaster);
             while (rclPaths.size() != 0) {
                 System.out.println("-----------Half hard");
 
@@ -160,13 +178,17 @@ public class GRASPMain {
                 }
                 
                 copyOfP.remove(auxPath);
+                long endTimeIter = System.currentTimeMillis();
+                System.out.println("half hard time iter: "+(endTimeIter-startTimeIter));
             }
         }
-        
-        long endHalfHard=System.currentTimeMillis();
-        System.out.println("time elapsed for Half Hard:"+(endHalfHard-endTrivial));
-        
-        if(reroutingPath==null){;
+        endTimeMain = System.currentTimeMillis();
+        System.out.println("half hard time: "+(endTimeMain-startTimeMain));
+
+        System.out.println("Checkpoint AFTER HALF HARD :"+(System.currentTimeMillis()-graspStart));
+
+        startTimeMain = System.currentTimeMillis();
+        if(reroutingPath==null){
             
             copyOfP = new ArrayList<Path>(P);
             rclPaths = null;
@@ -174,10 +196,11 @@ public class GRASPMain {
             costFunctionValue = -1;
 
             visitedPathsInSection.clear();
-            rclPaths = getRCLPaths(copyOfP);
+            rclPaths = new ArrayList<>(rclPathsMaster);
 
             while (rclPaths.size() != 0) {
                 System.out.println("----------- hard");
+                long startHardIter = System.currentTimeMillis();
     			auxPath = getRandomPath(rclPaths);
                 rclPaths.remove(auxPath);
     			
@@ -194,10 +217,13 @@ public class GRASPMain {
                     Transfer.resetReschedules();
                 }
                 copyOfP.remove(auxPath);
+                long endHardIter = System.currentTimeMillis();
+                System.out.println("hard iter time: "+(endHardIter-startHardIter));
             }
         }
-
-
+        endTimeMain = System.currentTimeMillis();
+        System.out.println("hard time: "+(endTimeMain-startTimeMain));
+        System.out.println("Checkpoint AFTER HARD :"+(System.currentTimeMillis()-graspStart));
 //        System.out.println("time elapsed for localSearch: "+(endLocalSearch-endHard));
 //        System.out.println("total time: "+(endHard-startTimeMain));
         System.out.println("Final reschedules needed: "+min_reschedule);
