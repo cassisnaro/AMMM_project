@@ -17,7 +17,7 @@
 \section{Introduction}
 % to do: maybe add an example? make references and label sections
 
-For our project we implemented the integer linear programming model described in the paper "Managing Transfer-Based Datacenter Connections" by Adrian Asensio and Luis Velasco. In order to accommodate spikes in cloud demand, while managing the energy consumption of datacenters, it is necessary for datacenter federations to be created. When building large infrastructures cloud operators, with the help of these federations, are capable of reducing capital expenditures by having a dinamic cloud service that uses under-utilized resources in remote datacenters. These dinamic cloud services the huge energy consumption in remote datacenters are minimized, because servers can be turned on and off as needed \todo{what?}. To implement these sort of elastic operations, cloud computing strongly depends on the interconnected datacenters through a network providing huge capacity and having the necessary resources available. The interdatacenter traffic results from workloads being encapsulated in virtual machines and moved on different data-centers. Because the amount of data that needs to be transferred is huge, data-centers are interconnected with a flexgrid optical network. Resource managers can set up and tear down connections of the necessary bitrate, for a specified time period needed to transfer the data. For each of these connections, the frequency slot, i.e. spectrum width, depends on the bandwidth requested and the used modulation format. Elastic connections were suggested due to the fact that not enough resources might be available at the request time, so the manager can dynamically modify the spectrum allocated (RSSA problem) \todo{isn't that the RSA problem?} to ongoing transferences and the requested connection to accommodate all traffic and complete it in the requested time. These elastic connections are possible through programmable bandwidth-variable transponders that can provide optical signals of different characteristics.\\
+For our project we implemented the integer linear programming model described in the paper "Managing Transfer-Based Datacenter Connections" by Adrian Asensio and Luis Velasco. In order to accommodate spikes in cloud demand, while managing the energy consumption of datacenters, it is necessary for datacenter federations to be created. When building large infrastructures cloud operators, with the help of these federations, are capable of reducing capital expenditures by having a dinamic cloud service that uses under-utilized resources in remote datacenters. These dinamic cloud services the huge energy consumption in remote datacenters are minimized, because servers can be turned on and off as needed \todo{what?}. To implement these sort of elastic operations, cloud computing strongly depends on the interconnected datacenters through a network providing the necessary resources available. The interdatacenter traffic results from workloads being encapsulated in virtual machines and moved on different data-centers. Because the amount of data that needs to be transferred is huge, data-centers are interconnected with a flexgrid optical network. Resource managers can set up and tear down connections of the necessary bitrate, for a specified time period needed to transfer the data. For each of these connections, the frequency slot, i.e. spectrum width, depends on the bandwidth requested and the used modulation format. Elastic connections were suggested due to the fact that not enough resources might be available at the request time, so the manager can dynamically modify the spectrum allocated (RSSA problem) \todo{isn't that the RSA problem?} to ongoing transferences and the requested connection to accommodate all traffic and complete it in the requested time. These elastic connections are possible through programmable bandwidth-variable transponders that can provide optical signals of different characteristics.\\
 
 A different approach was proposed in \cite{1}, the author use carrier software defined network (SDN) controller on top of ABNO transforms requests from cloud resource managers into connection requests, which helps with a better understanding of network complexity. This paper further explores carrier SDN functionalities by using scheduling techniques in addition to elastic operations, which as a result increases network operator revenues by accepting more connection requests. The SDN controller computes the routing path and necessary spectrum for each transfer and decides the elastic operations that need to be done on ongoing transferences to fit the new transfer, while satisfying the completion time for all transfers.\\
 
@@ -30,7 +30,7 @@ In order to simplify the RSSA problem, we limited our project to only one new tr
 % to do: do we need pseudo code for precomputing?
 A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{r}$ from time $t_{0}$ to $t^{1}_{r}$ and $s^{1}_{r}$ from time $t^{1}_{r}$ to $t_{r}$, so that the combined area of the two rectangles allows conveying the remaining amount of data $v_{r}$ and $t_{r} \leq  c_{r}$. To decide dimensions, spectrum and time for the ongoing transferences are precomputed. To do this we have written a Java program which precomputes any feasible combination of rectangles $A_{0}$ and $A_{1}$. To obtain these rectangles, we consider discretized time. The sets of rectangles are generated for the ongoing transferences and the requested transfer.\\\\
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Generation of rectangles}\label{rectangles_precomputation}
 \begin{algorithmic}[1]
 \Procedure{Rectangles\_precomputation}{$transfer, max\_slice$}
@@ -112,34 +112,103 @@ To solve the spectrum allocation problem use the Greedy and GRASP algorithms. In
 
 A trivial case, showed in Figure~\ref{fig:trivial}, happens when adding a new transfer into the network does not require the rescheduling of any of the other scheduled ongoing transfers, because the required number of free slices is already available throughout all of the slices of the assigned path of the new transfer.\\
 
-\begin{figure}
+\begin{figure}[H]
   \centering
     \includegraphics[scale=1]{trivialcase.jpg}
   \caption{Trivial Case}
   \label{fig:trivial}
 \end{figure}
 
+\begin{algorithm}[H]
+\caption{Easy solution}\label{easy_case}
+\begin{algorithmic}[1]
+\Procedure{Easy\_solution}{$path, all\_slices, required\_slices$}
+	\State $transmission\_collection\gets path.transmission$
+	\State $available\_slices\gets all\_slices$
+	\ForAll{$transmission \in transmission\_collection$}
+      \State $available\_slices \gets available\_slices\setminus transmission.slices$
+	\EndFor
+	\State $max\_window \gets max\_consecutive\_slices(available\_slices)$
+	\State \Return $max\_window \geq required\_slices$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
 \subsubsection{Half Hard Case}
 
 The half hard case, Figure~\ref{fig:halfhardcase}, implies evaluating the possibility of adding a new transfer into the network. In this scenario only some slices are currently available, but not enough. As a consequence, it is necessary to check on each link, of all of the ongoing transferences, and see if they can be rearranged to increase the time it takes to end the transaction, while still maintaining the completion time constraint, consequently freeing up some slices for the requested transfer. We first check if ``squeezing'' the left transfer to the left we have enough space, if not we try ``squeezing'' the right transfer to the right and check again if we have freed all the slices needed by the new transfer.\\
 
-\begin{figure}
+\begin{figure}[H]
   \centering
     \includegraphics[scale=1]{halfhardcase.jpg}
   \caption{Half Hard Case}
   \label{fig:halfhardcase}
 \end{figure}
 
+\begin{algorithm}[H]
+\caption{Half hard}\label{half_hard}
+\begin{algorithmic}[1]
+\Procedure{Half\_hard\_solution}{$path, all\_slices, required\_slices$}
+	\State $transmission\_collection\gets path.transmission$
+	\State $available\_slices\gets all\_slices$
+	\ForAll{$transmission \in transmission\_collection$}
+      \State $available\_slices \gets available\_slices\setminus transmission.slices$
+	\EndFor
+	
+	\State $found \gets False$
+	\ForAll{$candidate \in consecutive\_slices(available\_slices)$}
+		\ForAll{$transmission \in transmission\_collection$}
+			\State $transmission.free\_around\_candidate(candidate)$
+		\EndFor
+		\State $candidate.update()$
+		\If $candidate.size \geq required_slices$
+			\State $found \gets True$
+			\State $Break$
+		\EndIf
+	\EndFor
+	\State \Return $found$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
 \subsubsection{Hard Case}
 
 When we do not have any free slices available in any link throughout the selected path, we have a hard case, Figure~\ref{fig:hardcase}. In this particular case, we have to perform the same ``squeezing'' procedure specified in the previous case, but first we have to check each intersection point between two ongoing transferences to select a starting point where we can insert the new transfer that needs to be scheduled. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there.\\
 
-\begin{figure}
+\begin{figure}[H]
   \centering
     \includegraphics[scale=1]{hardcase.jpg}
   \caption{Hard Case}
   \label{fig:hardcase}
 \end{figure}
+
+\begin{algorithm}[H]
+\caption{Hard}\label{hard}
+\begin{algorithmic}[1]
+\Procedure{hard\_solution}{$path, all\_slices, required\_slices$}
+	\State $transmission\_collection\gets path.transmission$
+	\State $available\_slices\gets all\_slices$
+	\State $candidates\_collection\gets new Set()$
+	\ForAll{$transmission \in transmission\_collection$}
+      \State $candidates\_collection.insert(transmission.first\_slice)$
+      \State $candidates\_collection.insert(transmission.last\_slice)$
+	\EndFor
+	
+	\State $found \gets False$
+	\ForAll{$candidate \in candidates\_collection$}
+		\ForAll{$transmission \in transmission\_collection$}
+			\State $transmission.free\_around\_candidate(candidate)$
+		\EndFor
+		\State $window\_size=getSizeWindowCreated()$
+		\If $window\_size \geq required\_slices$
+			\State $found \gets True$
+			\State $Break$
+		\EndIf
+	\EndFor
+	\State \Return $found$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Greedy}
 For our first meta-heuristic, we used the Greedy algorithm that iterates through all the precomputed paths, going through all the previously defined cases to find a feasible solution. If a solution is found for a given path, the loop termites and the rest of the paths are not checked.
@@ -150,13 +219,90 @@ For our first meta-heuristic, we used the Greedy algorithm that iterates through
 
 For the second meta-heuristic we implemented a GRASP-like algorithm. The precomputed paths mentioned earlier are sorted by length or number of hops to create our set $C$ of candidates. Using an alpha parameter of 0.3 we select only the best subset of smallest found paths, this is, the RCL set. For each of the three types of solutions we iterate ten times over the paths in the RCL: we select one at random and try to solve it according to the current section. We have a book-keep in each of the three sections to maintain a list of visited paths such that we do not select twice the same option.\\
 
+\begin{algorithm}[H]
+\caption{GRASP-like}\label{grasp}
+\begin{algorithmic}[1]
+\Procedure{GRASP\_like}{$graph, requested\_transfer, ongoing\_transfers$}
+	\State $pathes \gets graph.bfs(requested\_transfer)$
+	\State $pathes.apply(ongoing\_transfers)$
+	\State $sort(pathes)$
+
+	\State $RCL \gets pathes.select(pathes.min, pathes.min+RCL.\alpha*(pathes.max-pathes.min)$
+	\State $minReschedules \gets \infty$
+	\State $bestReschedule \gets null$
+
+	\For{$i=0 \to 10$}
+		\State $RCL.discard(visited\_trivial)$
+		\State $path \gets selectRandom(RCL)$
+		\State $currentReschedule \gets Easy\_solution(path)$
+		 \If{$currentReschedule.reschedules \leq minReschedules$}
+			\State $minReschedules \gets currentReschedule.reschedules$
+			\State $bestReschedule \gets currentReschedule$
+		\EndIf
+		\State $visited\_trivial.add(path)$
+	\EndFor
+
+	\If{$minReschedules\geq 0$}
+		\For{$i=0 \to 10$}
+			\State $RCL.discard(visited\_HalfHard)$
+			\State $path \gets selectRandom(RCL)$
+			\State $currentReschedule \gets HalfHard\_solution(path)$
+			 \If{$currentReschedule.reschedules \leq minReschedules$}
+				\State $minReschedules \gets currentReschedule.reschedules$
+				\State $bestReschedule \gets currentReschedule$
+			\EndIf
+			\State $visited\_HalfHard.add(path)$
+		\EndFor
+		\For{$i=0 \to 10$}
+			\State $RCL.discard(visited\_Hard)$
+			\State $path \gets selectRandom(RCL)$
+			\State $currentReschedule \gets Hard\_solution(path)$
+			 \If{$currentReschedule.reschedules \leq minReschedules$}
+				\State $minReschedules \gets currentReschedule.reschedules$
+				\State $bestReschedule \gets currentReschedule$
+			\EndIf
+			\State $visited\_Hard.add(path)$
+		\EndFor
+
+		\State $localSearch(bestReschedule)$
+	\EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
 The shortest the path, the more likely it is that we will need less reschedules. With repeatedly random selection we have seen improvement in our optimization: all those cases where the first path returned by the BFS was not the best one, are now improved. The problem is that we need more time to sort the data, retry repeatedly, etc.
 
 \subsubsection{Local Search}
 
 The local search of our GRASP algorithm consists of using as an input all the free slices obtained after deciding the reschedules to be done. If we have more slices available than the ones required for the requested transfer, we check if we can safely undo some of the reschedule decided in the construction phase. We then choose the undoing which gives us the minimal of total reschedules needed.\\
 
-The decision process is straightforward. We iterate over the set of available slices, and select a window of consecutive slices. This window has to be as long as the minimal number of slices needed. We then test if some of reschedules consisted in liberating slices which are not in our window. All those reschedules can then be safely undone. Of course we select as the best answer the window which enables us to undo as many reschedules as possible.
+The decision process is straightforward. We iterate over the set of available slices, and select a window of consecutive slices. This window has to be as long as the minimal number of slices needed. We then test if some of reschedules consisted in liberating slices which are not in our window. All those reschedules can then be safely undone. Of course we select as the best answer the window which enables us to undo as many reschedules as possible.\\ 
+
+\begin{algorithm}[H]
+\caption{Local Search}\label{local_search}
+\begin{algorithmic}[1]
+\Procedure{local\_search}{$window\_available, required\_slices, reschedules\_done$}
+	\State $MaxUndoesPossible \gets -1$
+	\State $BestUndoCollection \gets null$
+	\For{$i=0 \to window\_available-required\_slices$}
+		\State $UndoCollection \gets new Set()$
+		\State $undo\_candidate \gets [window\_available[0]..window\_available[i-1]] \cup [window\_available[i+required\_slices]..window\_available[end]]$
+		\State $undoes\_possible\gets 0$
+		\ForAll($transmission \in reschedules_possible$)
+			\If{$transmission.undo\_possible(undo\_candidate)$}
+				\State $undoes\_possible++$
+				\State $UndoCollection.add(transmission.validate\_undo())$
+			\EndIf
+		\EndFor
+		\If{$undoes\_possible \geq MaxUndoesPossible$}
+			\State $MaxUndoesPossible \gets undoes\_possible$
+			\State $MaxUndoesPossible \gets UndoCollection.add		(transmission.validate\_undo())$
+		\EndIf
+	\EndFor
+	\State \Return $reschedules\_done.size - MaxUndoesPossible$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
 \section{Results}
 
@@ -164,7 +310,12 @@ The decision process is straightforward. We iterate over the set of available sl
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{e}.\\
 
-\includegraphics[scale=0.7]{inputTestHardAndHalfHard.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTestHardAndHalfHard.png}
+  \caption{Test 1}
+  \label{fig:test1}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -177,7 +328,12 @@ Total Time & 185.8 & 60 & 110 \\ \hline
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{e}.\\
 
-\includegraphics[scale=0.7]{inputTestHardAndTrivial.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTestHardAndTrivial.png}
+  \caption{Test 2}
+  \label{fig:test2}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -190,7 +346,12 @@ Total Time & 111.7 & 71 & 88 \\ \hline
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{e}.\\
 
-\includegraphics[scale=0.7]{inputTestHardAndTrivial.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTestHardAndTrivial.png}
+  \caption{Test 3}
+  \label{fig:test3}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -203,7 +364,12 @@ Total Time & 291 & 58 & 98 \\ \hline
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 
-\includegraphics[scale=0.7]{inputTestHalfHard.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTestHalfHard.png}
+  \caption{Test 4}
+  \label{fig:test4}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -216,7 +382,12 @@ Total Time & 151.4 & 64 & 82 \\ \hline
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{e}.\\
 
-\includegraphics[scale=0.7]{inputSeeDifferencesGreedyCplex.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputSeeDifferencesGreedyCplex.png}
+  \caption{Test 5}
+  \label{fig:test5}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -230,7 +401,12 @@ Total Time & 135 & 61 & 97 \\ \hline
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 1.\\
 
-\includegraphics[scale=0.7]{inputTestHard.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTestHard.png}
+  \caption{Test 6}
+  \label{fig:test6}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -243,7 +419,12 @@ Total Time & 87.2 & 42 & 76 \\ \hline
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 2.\\
 
-\includegraphics[scale=0.7]{inputTest2Hard.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTest2Hard.png}
+  \caption{Test 7}
+  \label{fig:test7}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -256,7 +437,12 @@ Total Time & 107 & 56 & 104 \\ \hline
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 3.\\
 
-\includegraphics[scale=0.7]{inputTest3Hard.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTest3Hard.png}
+  \caption{Test 8}
+  \label{fig:test8}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -269,7 +455,12 @@ Total Time & 168.9 & 81 & 107 \\ \hline
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 5.\\
 
-\includegraphics[scale=0.7]{inputTest5Hard.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTest5Hard.png}
+  \caption{Test 9}
+  \label{fig:test9}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
@@ -282,13 +473,27 @@ Total Time & 177.7 & 11 & 125 \\ \hline
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 7.\\
 
-\includegraphics[scale=0.7]{inputTest7Hard.png}\\
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{inputTest7Hard.png}
+  \caption{Test 10}
+  \label{fig:test10}
+\end{figure}
 
 \begin{tabular}{| l | l | l | l |}
 \hline
  & CPLEX & Greedy & GRASP \\ \hline
 Total Time & 253.6 & 79 & 125 \\ \hline
 \end{tabular}
+
+\subsection{Performance Comparison: CPLEX vs. Greedy vs. GRASP}
+
+\begin{figure}[H]
+    \hspace*{-3cm}
+	\includegraphics[scale=0.5]{executionTimeGraph.png}
+  \caption{CPLEX vs. Greedy vs. GRASP}
+  \label{fig:performance}
+\end{figure}
 
 \section{Conclusion}
 \end{document}
