@@ -84,8 +84,12 @@ When we do not have any free slices available in any link throughout the selecte
 \includegraphics[scale=1]{hardcase.jpg}
 
  \subsection{Greedy}
+For our first methaheuristic, we used the Greedy algorithm that iterates through all the precomputed paths, going through all the previously defined cases to find a feasible solution. If a solution is found for a given path, the loop termites and the rest of the paths are not checked.
  
  \subsection{GRASP}
+Using the GRASP algorithm for the second metaheuristic, we define the greedy function and the RCL. We order the precomputed available paths by length or number of hop, and use an alpha parameter of 0.3 to select only the best subset of smallest found paths. Once the RCL is is found, we can start iterating. At each step, we select at random one of the paths within this array of paths.\\
+
+The local search of our GRASP algorithm consists of using as an input all the free slices obtained after deciding the reschedules to be done. If we have more slices available than the ones required for the requested transfer, we check if we can safely undo some of the reschedule. We then choose the undoing which gives us the minimal total number of reschedulings needed.
 
 
 \section{Results}
