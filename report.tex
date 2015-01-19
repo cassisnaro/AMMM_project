@@ -5,6 +5,9 @@
 \usepackage{amssymb}
 \usepackage{float}
 \usepackage{graphicx}
+\usepackage{todonotes}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \restylefloat{table}
 \title{Project Report: Managing Transfer-Based Datacenter Connections}
@@ -14,18 +17,47 @@
 \section{Introduction}
 % to do: maybe add an example? make references and label sections
 
-For our project we implemented the integer linear programming model described in the paper "Managing Transfer-Based Datacenter Connections" by Adrian Asensio and Luis Velasco. In order to accommodate spikes in cloud demand, while managing the energy consumption of datacenters, it is necessary for datacenter federations to be created. When building large infrastructures cloud operators, with the help of these federations, are capable of reducing capital expenditures by having a dinamic cloud service that uses under-utilized resources in remote datacenters. These dinamic cloud services the huge energy consumption in remote datacenters are minimized, because servers can be turned on and off as needed. To implement these sort of elastic operations, cloud computing strongly depends on the interconnected datacenters through a network providing huge capacity and having the necessary resources available. The interdatacenter traffic results from workloads being encapsulated in virtual machines and moved on different datacenters. Because the amount of data that needs to be transferred is in a huge volume, these features can be covered with a flexgrid optical network, i.e. resource managers can set up and tear down connections of the necessary bitrate only for the amount of time needed to transfer the data. For each of these connections, the frequency slot, i.e. spectrum width, depends on the bandwidth requested and the used modulation format. Elastic connections were suggested due to the fact that not enough resources might be available at the request time, so the manager can dynamically modify the spectrum allocated (RSSA problem) to ongoing transferences and the requested connection to accomodate all traffic and complete it in the requested time. These elastic connections are possible through programmable bandwidth-variable transponders that can provide optical signals of different characteristics.\\
+For our project we implemented the integer linear programming model described in the paper "Managing Transfer-Based Datacenter Connections" by Adrian Asensio and Luis Velasco. In order to accommodate spikes in cloud demand, while managing the energy consumption of datacenters, it is necessary for datacenter federations to be created. When building large infrastructures cloud operators, with the help of these federations, are capable of reducing capital expenditures by having a dinamic cloud service that uses under-utilized resources in remote datacenters. These dinamic cloud services the huge energy consumption in remote datacenters are minimized, because servers can be turned on and off as needed \todo{what?}. To implement these sort of elastic operations, cloud computing strongly depends on the interconnected datacenters through a network providing huge capacity and having the necessary resources available. The interdatacenter traffic results from workloads being encapsulated in virtual machines and moved on different data-centers. Because the amount of data that needs to be transferred is huge, data-centers are interconnected with a flexgrid optical network. Resource managers can set up and tear down connections of the necessary bitrate, for a specified time period needed to transfer the data. For each of these connections, the frequency slot, i.e. spectrum width, depends on the bandwidth requested and the used modulation format. Elastic connections were suggested due to the fact that not enough resources might be available at the request time, so the manager can dynamically modify the spectrum allocated (RSSA problem) \todo{isn't that the RSA problem?} to ongoing transferences and the requested connection to accommodate all traffic and complete it in the requested time. These elastic connections are possible through programmable bandwidth-variable transponders that can provide optical signals of different characteristics.\\
 
-A different approach was proposed in \cite{1}, uses carrier software defined network (SDN) controller on top of ABNO transforms requests from cloud resource managers into connection requests, which helps with a better understanding of network complexity. This paper further explores carrier SDN functionalities by using scheduling techniques in addition to elastic operations, which as a result increases network operator revenues by accepting more connection requests. The SDN controller computes the routing path and necessary spectrum for each transfer and the decides the elastic operations that need to be done on ongoing transferences to fit the new transfer, while satisfying the completion time for all transfers.\\
+A different approach was proposed in \cite{1}, the author use carrier software defined network (SDN) controller on top of ABNO transforms requests from cloud resource managers into connection requests, which helps with a better understanding of network complexity. This paper further explores carrier SDN functionalities by using scheduling techniques in addition to elastic operations, which as a result increases network operator revenues by accepting more connection requests. The SDN controller computes the routing path and necessary spectrum for each transfer and decides the elastic operations that need to be done on ongoing transferences to fit the new transfer, while satisfying the completion time for all transfers.\\
 
 The rest of our project report is structured as follows. We present the integer linear programming (ILP) model implemented in section 2. Section 3 and 4 defines two metaheuristic algorithms. The results of our project and a comparison of the results obtained are detailed in section 5. Finally, section 6 concludes the report.
 
-\section{IPL Model}
+\section{ILP Model}
 
-In order to simplify the RSSA problem, we limited our project to only one new transfer being requested. We have a network topology represented by a graph $G(L,E)$ with a set of locations ($L$) and set of fiber connections ($E$). We are given a subset ($D$) of the datacenters' locations, the characteristics for each fiber connection, i.e. a set $S$ of available spectrum slices, and the capacity and number of flows of the optical transponders at each location. The set $R$ contains the ongoing transferences, and origin ($o_{r}$), destination ($d_{r}$), the remaining amount of data ($v_{r}$) to be transferred, the requested completion time ($c_{r}$), the route ($r_{r}$) and slot currently allocated ($s^{0}_{r}$), the scheduled slot allocation ($s^{1}_{r}$) to be performed at time $t^{1}_{r}$, and the scheduled completion time ($t_{r}$) for each transfer in the tuple $\{o_{r}; d_{r}; v_{r}; c_{r}; r_{r}; s^{0}_{r} ; s^{1}_{r} ; t^{1}_{r} ; t_{r}\}$. The details of the new transfer request are given in the tuple $\{o_{r}; d_{r}; v_{r}; c_{r}\}$. The output of our model is the route allocated ($r_{r}$), scheduled completion time ($t_{r}$), bitrate of the connection ($s^{0}_{r}$), the new spectrum allocation ($w^{0}_{r}$), scheduled reallocation ($w^{1}_{r}$, $t^{1}_{r}$), and completion time ($t_{r}$) for each transference request that is rescheduled. Our objective is to minimize the number of connections to be rescheduled to make room for the incoming request.\\
+In order to simplify the RSSA problem, we limited our project to only one new transfer being requested. We have a network topology represented by a graph $G(L,E)$ with a set of locations ($L$) and set of fiber connections ($E$). We are given a subset ($D$) of the data-centers' locations. We also know the characteristics of the connections, i.e. a set $S$ of available spectrum slices, and the capacity and number of flows of the optical transponders at each location. The set $R$ contains the ongoing transferences. For each transfer we know the origin ($o_{r}$), destination ($d_{r}$), the remaining amount of data ($v_{r}$) to be transferred, the requested completion time ($c_{r}$), the route ($r_{r}$) and slot currently allocated ($s^{0}_{r}$), the scheduled slot allocation ($s^{1}_{r}$) to be performed at time $t^{1}_{r}$, and the scheduled completion time ($t_{r}$). The details of the new transfer request are given in the tuple $\{o_{r}; d_{r}; v_{r}; c_{r}\}$. The output of our model is the route allocated ($r_{r}$), scheduled completion time ($t_{r}$), bitrate of the connection ($s^{0}_{r}$), the new spectrum allocation ($w^{0}_{r}$), scheduled reallocation ($w^{1}_{r}$, $t^{1}_{r}$), and completion time ($t_{r}$) for each transference that is rescheduled. Our objective is to minimize the number of connections to be rescheduled to make room for the incoming request.\\
 
 % to do: do we need pseudo code for precomputing?
-A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{r}$ from $t_{0}$ to $t^{1}_{r}$ and $s^{1}_{r}$ from $t^{1}_{r}$ to $t_{r}$, so that the combined area of the two rectangles allows conveying the remaining amount of data $v_{r}$ and $t_{r} \leq  c_{r}$. To decide dimensions, spectrum and time for the ongoing transferences might lead to nonlinear constraints. Because of this we have written a Java program to precompute any feasible combination of rectangles $A_{0}$ and $A_{1}$ for these transfers, with discretizing time into intervals. A set of precomputed rectangles A for the incoming transfer request is also computed, taking into account completion time and amout of data to be transferred.\\\\
+A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{r}$ from time $t_{0}$ to $t^{1}_{r}$ and $s^{1}_{r}$ from time $t^{1}_{r}$ to $t_{r}$, so that the combined area of the two rectangles allows conveying the remaining amount of data $v_{r}$ and $t_{r} \leq  c_{r}$. To decide dimensions, spectrum and time for the ongoing transferences are precomputed. To do this we have written a Java program which precomputes any feasible combination of rectangles $A_{0}$ and $A_{1}$. To obtain these rectangles, we consider discretized time. The sets of rectangles are generated for the ongoing transferences and the requested transfer.\\\\
+
+\begin{algorithm}
+\caption{Generation of rectangles}\label{rectangles_precomputation}
+\begin{algorithmic}[1]
+\Procedure{Rectangles\_precomputation}{$transfer, max\_slice$}
+	\State $start\_time\_a0 \gets 0$
+	\State $compliant\_rectangles\_pair$
+	\For{$end\_time\_a0=1 \to transfer.dead\_line$}
+		\For{$slice\_start\_a0=0 \to max\_slice$}
+			\For{$slice\_end\_a0=slice\_star\_a0 \to max\_slice$}
+				\State $tmp\_a0 \gets Rectangle(start\_time\_a0, end\_time\_a0,slice\_start_a0,slice\_end\_a0)$
+				\For{$j=i \to transfer.dead_line$}
+					\For{$slice\_start_a1=0 \to slice\_start_a0$}
+						\For{$slice\_end_a1=slice\_end_a0 \to max_slice$}
+							\State $tmp\_a1 \gets Rectangle(start\_time\_a1, end\_time\_a1,slice\_start_a1,slice\_end\_a1)$
+							\If{$transfer.rectanglesCompliant(tmp\_a0, tmp\_a1)$}
+								\State $compliant\_rectangles.add(tmp\_a0, tmp\_a1)$
+							\EndIf
+						\EndFor
+					\EndFor		
+				\EndFor
+			\EndFor
+		\EndFor		
+	\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
 In order to present the ILP model, we define the necessary parameters and variables:
 \begin{table}[H]
 \small
