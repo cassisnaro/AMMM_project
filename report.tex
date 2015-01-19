@@ -110,7 +110,7 @@ To solve the spectrum allocation problem use the Greedy and GRASP algorithms. In
 
 \subsubsection{Trivial Case}
 
-A trivial case, showed in Figure~\ref{fig:trivial}, happens when adding a new transfer into the network does not require the rescheduling of any of the other scheduled ongoing transfers, because the required number of free slices is already available throughout all of the slices of the assigned path of the new transfer.\\
+A trivial case, showed in Figure~\ref{fig:trivial}, happens when adding a new transfer into the network does not require the rescheduling of any of the other scheduled ongoing transfers, because the required number of free slices is already available throughout all of the slices of the assigned path of the new transfer. In Algorithm~\ref{easy_case} you can see the algorithm explained in pseudo-code.\\
 
 \begin{figure}[H]
   \centering
@@ -136,7 +136,7 @@ A trivial case, showed in Figure~\ref{fig:trivial}, happens when adding a new tr
 
 \subsubsection{Half Hard Case}
 
-The half hard case, Figure~\ref{fig:halfhardcase}, implies evaluating the possibility of adding a new transfer into the network. In this scenario only some slices are currently available, but not enough. As a consequence, it is necessary to check on each link, of all of the ongoing transferences, and see if they can be rearranged to increase the time it takes to end the transaction, while still maintaining the completion time constraint, consequently freeing up some slices for the requested transfer. We first check if ``squeezing'' the left transfer to the left we have enough space, if not we try ``squeezing'' the right transfer to the right and check again if we have freed all the slices needed by the new transfer.\\
+The half hard case, Figure~\ref{fig:halfhardcase}, implies evaluating the possibility of adding a new transfer into the network. In this scenario only some slices are currently available, but not enough. As a consequence, it is necessary to check on each link, of all of the ongoing transferences, and see if they can be rearranged to increase the time it takes to end the transaction, while still maintaining the completion time constraint, consequently freeing up some slices for the requested transfer. We first check if ``squeezing'' the left transfer to the left we have enough space, if not we try ``squeezing'' the right transfer to the right and check again if we have freed all the slices needed by the new transfer. Algorithm~\ref{half_hard} refers to pseudo-code of this particular case.\\
 
 \begin{figure}[H]
   \centering
@@ -173,7 +173,7 @@ The half hard case, Figure~\ref{fig:halfhardcase}, implies evaluating the possib
 
 \subsubsection{Hard Case}
 
-When we do not have any free slices available in any link throughout the selected path, we have a hard case, Figure~\ref{fig:hardcase}. In this particular case, we have to perform the same ``squeezing'' procedure specified in the previous case, but first we have to check each intersection point between two ongoing transferences to select a starting point where we can insert the new transfer that needs to be scheduled. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there.\\
+When we do not have any free slices available in any link throughout the selected path, we have a hard case, Figure~\ref{fig:hardcase}. In this particular case, we have to perform the same ``squeezing'' procedure specified in the previous case, but first we have to check each intersection point between two ongoing transferences to select a starting point where we can insert the new transfer that needs to be scheduled. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there. More details about this case can be seen in Algorithm~\ref{hard} pseudo-code.\\
 
 \begin{figure}[H]
   \centering
@@ -217,7 +217,7 @@ For our first meta-heuristic, we used the Greedy algorithm that iterates through
 
 \subsubsection{Construction Phase}
 
-For the second meta-heuristic we implemented a GRASP-like algorithm. The precomputed paths mentioned earlier are sorted by length or number of hops to create our set $C$ of candidates. Using an alpha parameter of 0.3 we select only the best subset of smallest found paths, this is, the RCL set. For each of the three types of solutions we iterate ten times over the paths in the RCL: we select one at random and try to solve it according to the current section. We have a book-keep in each of the three sections to maintain a list of visited paths such that we do not select twice the same option.\\
+For the second meta-heuristic we implemented a GRASP-like algorithm. The precomputed paths mentioned earlier are sorted by length or number of hops to create our set $C$ of candidates. Using an alpha parameter of 0.3 we select only the best subset of smallest found paths, this is, the RCL set. For each of the three types of solutions we iterate ten times over the paths in the RCL: we select one at random and try to solve it according to the current section. We have a book-keep in each of the three sections to maintain a list of visited paths such that we do not select twice the same option. The general algorithm is described as pseudo-code in Algoritm~\ref{grasp}.\\
 
 \begin{algorithm}[H]
 \caption{GRASP-like}\label{grasp}
@@ -276,7 +276,7 @@ The shortest the path, the more likely it is that we will need less reschedules.
 
 The local search of our GRASP algorithm consists of using as an input all the free slices obtained after deciding the reschedules to be done. If we have more slices available than the ones required for the requested transfer, we check if we can safely undo some of the reschedule decided in the construction phase. We then choose the undoing which gives us the minimal of total reschedules needed.\\
 
-The decision process is straightforward. We iterate over the set of available slices, and select a window of consecutive slices. This window has to be as long as the minimal number of slices needed. We then test if some of reschedules consisted in liberating slices which are not in our window. All those reschedules can then be safely undone. Of course we select as the best answer the window which enables us to undo as many reschedules as possible.\\ 
+The decision process is straightforward. We iterate over the set of available slices, and select a window of consecutive slices. This window has to be as long as the minimal number of slices needed. We then test if some of reschedules consisted in liberating slices which are not in our window. All those reschedules can then be safely undone. Of course we select as the best answer the window which enables us to undo as many reschedules as possible. Below the pseudo-code of this search in Algoritm~\ref{local_search}.\\ 
 
 \begin{algorithm}[H]
 \caption{Local Search}\label{local_search}
@@ -322,7 +322,9 @@ The decision process is straightforward. We iterate over the set of available sl
  & CPLEX & Greedy & GRASP \\ \hline
 Result & 1 & 1 & 1 \\ \hline
 Total Time & 185.8 & 60 & 110 \\ \hline
-\end{tabular}
+\end{tabular}\\\\
+
+In this example we combine two paths, one with a half-hard solution, the other with a hard solution. The optimal solution is found by rescheduling the half-hard path. The main question is if the Greedy version will take advantage of the fact it will not even check the hard path. Effectively, the time needed by Greedy is clearly the lowest in this scenario.
 
 \subsection{Test 2: inputTestHardAndTrivial.txt}
 
@@ -340,7 +342,9 @@ Total Time & 185.8 & 60 & 110 \\ \hline
  & CPLEX & Greedy & GRASP \\ \hline
 Result & 0 & 0 & 0 \\ \hline
 Total Time & 111.7 & 71 & 88 \\ \hline
-\end{tabular}
+\end{tabular}\\\\
+
+In this test the obvious solution is to choose the path without any transmissions: all implementations choose this solution. Greedy and GRASP detect this solution right at the beginning, shortening the execution.
 
 \subsection{Test 3: inputTestCombinationIntersectionsSegments.txt}
 
@@ -358,7 +362,9 @@ Total Time & 111.7 & 71 & 88 \\ \hline
  & CPLEX & Greedy & GRASP \\ \hline
 Result & 5 & 6 & 5 \\ \hline
 Total Time & 291 & 58 & 98 \\ \hline
-\end{tabular}
+\end{tabular}\\\\
+
+In this test we have just one path, with many transmissions, defined in such a way that they form a hard solution. We compare how long will the meta-heuristics take to deal with this more complex problem, with the time needed by CPLEX. The result is a clear win for the meta-heuristics: even without taking into account the pre-computation needed before executing CPLEX, the meta-heuristics are faster. It is clear that the Java-code can deal better with the greater number of transmissions.
 
 \subsection{Test 4: inputTestHalfHard.txt}
 
