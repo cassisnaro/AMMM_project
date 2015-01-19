@@ -196,8 +196,8 @@ public class GRASPMain {
         System.out.println("Checkpoint AFTER HALF HARD :"+(System.currentTimeMillis()-graspStart));
 
         startTimeMain = System.currentTimeMillis();
-        if(reroutingPath==null  && reroutingPath==null){
-
+        //if(reroutingPath==null  && reroutingPath==null){
+        if(true){
             costFunctionValue = -1;
 
             visitedPathsInSection.clear();
