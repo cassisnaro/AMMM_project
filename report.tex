@@ -125,7 +125,153 @@ Using the GRASP algorithm for the second metaheuristic, we define the greedy fun
 
 The local search of our GRASP algorithm consists of using as an input all the free slices obtained after deciding the reschedules to be done. If we have more slices available than the ones required for the requested transfer, we check if we can safely undo some of the reschedule. We then choose the undoing which gives us the minimal total number of reschedulings needed.
 
+\begin{algorithm}
+\caption{Easy solution}\label{easy_case}
+\begin{algorithmic}[1]
+\Procedure{Easy\_solution}{$path, all\_slices, required\_slices$}
+	\State $transmission\_collection\gets path.transmission$
+	\State $available\_slices\gets all\_slices$
+	\ForAll{$transmission \in transmission\_collection$}
+      \State $available\_slices \gets available\_slices\setminus transmission.slices$
+	\EndFor
+	\State $max\_window \gets max\_consecutive\_slices(available\_slices)$
+	\State \Return $max\_window \geq required\_slices$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
+\begin{algorithm}
+\caption{Half hard}\label{half_hard}
+\begin{algorithmic}[1]
+\Procedure{Half\_hard\_solution}{$path, all\_slices, required\_slices$}
+	\State $transmission\_collection\gets path.transmission$
+	\State $available\_slices\gets all\_slices$
+	\ForAll{$transmission \in transmission\_collection$}
+      \State $available\_slices \gets available\_slices\setminus transmission.slices$
+	\EndFor
+	
+	\State $found \gets False$
+	\ForAll{$candidate \in consecutive\_slices(available\_slices)$}
+		\ForAll{$transmission \in transmission\_collection$}
+			\State $transmission.free\_around\_candidate(candidate)$
+		\EndFor
+		\State $candidate.update()$
+		\If $candidate.size \geq required_slices$
+			\State $found \gets True$
+			\State $Break$
+		\EndIf
+	\EndFor
+	\State \Return $found$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Hard}\label{hard}
+\begin{algorithmic}[1]
+\Procedure{hard\_solution}{$path, all\_slices, required\_slices$}
+	\State $transmission\_collection\gets path.transmission$
+	\State $available\_slices\gets all\_slices$
+	\State $candidates\_collection\gets new Set()$
+	\ForAll{$transmission \in transmission\_collection$}
+      \State $candidates\_collection.insert(transmission.first\_slice)$
+      \State $candidates\_collection.insert(transmission.last\_slice)$
+	\EndFor
+	
+	\State $found \gets False$
+	\ForAll{$candidate \in candidates\_collection$}
+		\ForAll{$transmission \in transmission\_collection$}
+			\State $transmission.free\_around\_candidate(candidate)$
+		\EndFor
+		\State $window\_size=getSizeWindowCreated()$
+		\If $window\_size \geq required\_slices$
+			\State $found \gets True$
+			\State $Break$
+		\EndIf
+	\EndFor
+	\State \Return $found$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Local Search}\label{local_search}
+\begin{algorithmic}[1]
+\Procedure{local\_search}{$window\_available, required\_slices, reschedules\_done$}
+	\State $MaxUndoesPossible \gets -1$
+	\State $BestUndoCollection \gets null$
+	\For{$i=0 \to window\_available-required\_slices$}
+		\State $UndoCollection \gets new Set()$
+		\State $undo\_candidate \gets [window\_available[0]..window\_available[i-1]] \cup [window\_available[i+required\_slices]..window\_available[end]]$
+		\State $undoes\_possible\gets 0$
+		\ForAll($transmission \in reschedules_possible$)
+			\If{$transmission.undo\_possible(undo\_candidate)$}
+				\State $undoes\_possible++$
+				\State $UndoCollection.add(transmission.validate\_undo())$
+			\EndIf
+		\EndFor
+		\If{$undoes\_possible \geq MaxUndoesPossible$}
+			\State $MaxUndoesPossible \gets undoes\_possible$
+			\State $MaxUndoesPossible \gets UndoCollection.add		(transmission.validate\_undo())$
+		\EndIf
+	\EndFor
+	\State \Return $reschedules\_done.size - MaxUndoesPossible$
+
+	
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{GRASP-like}\label{grasp}
+\begin{algorithmic}[1]
+\Procedure{GRASP\_like}{$graph, requested\_transfer, ongoing\_transfers$}
+	\State $pathes \gets graph.bfs(requested\_transfer)$
+	\State $pathes.apply(ongoing\_transfers)$
+	\State $sort(pathes)$
+
+	\State $RCL \gets pathes.select(pathes.min, pathes.min+RCL.\alpha*(pathes.max-pathes.min)$
+	\State $minReschedules \gets \infty$
+	\State $bestReschedule \gets null$
+
+	\For{$i=0 \to 10$}
+		\State $RCL.discard(visited\_trivial)$
+		\State $path \gets selectRandom(RCL)$
+		\State $currentReschedule \gets Easy\_solution(path)$
+		 \If{$currentReschedule.reschedules \leq minReschedules$}
+			\State $minReschedules \gets currentReschedule.reschedules$
+			\State $bestReschedule \gets currentReschedule$
+		\EndIf
+		\State $visited\_trivial.add(path)$
+	\EndFor
+
+	\If{$minReschedules\geq 0$}
+		\For{$i=0 \to 10$}
+			\State $RCL.discard(visited\_HalfHard)$
+			\State $path \gets selectRandom(RCL)$
+			\State $currentReschedule \gets HalfHard\_solution(path)$
+			 \If{$currentReschedule.reschedules \leq minReschedules$}
+				\State $minReschedules \gets currentReschedule.reschedules$
+				\State $bestReschedule \gets currentReschedule$
+			\EndIf
+			\State $visited\_HalfHard.add(path)$
+		\EndFor
+		\For{$i=0 \to 10$}
+			\State $RCL.discard(visited\_Hard)$
+			\State $path \gets selectRandom(RCL)$
+			\State $currentReschedule \gets Hard\_solution(path)$
+			 \If{$currentReschedule.reschedules \leq minReschedules$}
+				\State $minReschedules \gets currentReschedule.reschedules$
+				\State $bestReschedule \gets currentReschedule$
+			\EndIf
+			\State $visited\_Hard.add(path)$
+		\EndFor
+
+		\State $localSearch(bestReschedule)$
+	\EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 \section{Results}
 \section{Conclusion}
 \end{document}
