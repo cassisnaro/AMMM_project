@@ -27,13 +27,13 @@ This project report is structured as follows. We present the integer linear prog
 In order to simplify the spectrum allocation problem, we limited our project to only one new transfer being requested. We have a network topology represented by a graph $G(L,E)$ with a set of locations ($L$) and set of fiber connections ($E$). We are given a subset ($D$) of the data-center's locations. We also know the characteristics of the connections, i.e. a set $S$ of available spectrum slices, and the capacity and number of flows of the optical transponders at each location. The set $R$ contains the ongoing transferences. For each transfer we know the origin ($o_{r}$), destination ($d_{r}$), the remaining amount of data ($v_{r}$) to be transferred, the requested completion time ($c_{r}$), the route ($r_{r}$) and slot currently allocated ($s^{0}_{r}$), the scheduled slot allocation ($s^{1}_{r}$) to be performed at time $t^{1}_{r}$, and the scheduled completion time ($t_{r}$). The details of the new transfer request are given in the tuple $\{o_{r}; d_{r}; v_{r}; c_{r}\}$. The output of our model is the route allocated ($r_{r}$), scheduled completion time ($t_{r}$), bitrate of the connection ($s^{0}_{r}$), the new spectrum allocation ($w^{0}_{r}$), and scheduled reallocation ($w^{1}_{r}$, $t^{1}_{r}$) for each transference that is rescheduled. Our objective is to minimize the number of connections to be rescheduled to make room for the incoming request.\\
 
 % to do: do we need pseudo code for precomputing?
-A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{r}$ from time $t_{0}$ to $t^{1}_{r}$ and $s^{1}_{r}$ from time $t^{1}_{r}$ to $t_{r}$, such that the combined area of the two rectangles allows conveying the remaining amount of data $v_{r}$ and $t_{r} \leq  c_{r}$. To decide dimensions, spectrum and time necessary for the ongoing transferences are precomputed. To do this we have written a Java program which precomputes any feasible combination of rectangles $A_{0}$ and $A_{1}$. To obtain these rectangles, we consider discretized time. The sets of rectangles are generated for the ongoing transferences and the requested transfer. An example is shown in Figure~\ref{fig:rectangules}\\
+A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{r}$ from time $t_{0}$ to $t^{1}_{r}$ and $s^{1}_{r}$ from time $t^{1}_{r}$ to $t_{r}$, such that the combined area of the two rectangles allows conveying the remaining amount of data $v_{r}$ and $t_{r} \leq  c_{r}$. To decide dimensions, spectrum and time necessary for the ongoing transferences are precomputed. To do this we have written a Java program which precomputes any feasible combination of rectangles $A_{0}$ and $A_{1}$. To obtain these rectangles, we consider discretized time. The sets of rectangles are generated for the ongoing transferences and the requested transfer. An example is shown in Figure~\ref{fig:rectangles}.\\
 
 \begin{figure}[H]
     \hspace*{-1cm}
 	\includegraphics[scale=0.4]{threeAllocations.png}
-  \caption{Rectangule precomputation example. Three of the many possible scheduling combinations. Red vertical line indicates the time at which the transfer has to be terminated. We have available five frequency slices, and need to send ten units of data (unit of data is equal to the data sent in one slice in one time interval). }
-  \label{fig:rectangules}
+  \caption{Rectangle precomputation example. Three of the many possible scheduling combinations. Red vertical line indicates the time at which the transfer has to be terminated. We have available five frequency slices, and need to send ten units of data (unit of data is equal to the data sent in one slice in one time interval). }
+  \label{fig:rectangles}
 \end{figure}
 
 \begin{algorithm}[H]
@@ -100,9 +100,9 @@ $x^{1}_{ar}$ & 1 if transfer $r$ is assigned to area $a \in A_{1}$.\\
 
 And the ILP model is as follows:\\\\
 
-$minimize \sum_{r\in R} y_{r} $\\\\
+$minimize \sum_{r\in R} y_{r} $\\
 
-subject to:\\\\
+subject to:\\
 
 $\sum_{a \in A} \sum_{p \in P}$ $x_{ap} = 1$\\\\
 $\sum_{a \in A_{0(r)}}$ $x^{0}_{ar}=1$    $\forall r \in R$\\\\
@@ -459,6 +459,8 @@ In this example we provide different seven paths, all of which are hard. Each of
 Total Time & 65 & 22.2 & 42 & 76 \\ \hline
 \end{tabular}\\\\
 
+\newpage
+
 \subsection{Test 7: inputTest2Hard.txt}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
@@ -515,6 +517,8 @@ Total Time & 112 & 56.9 & 81 & 107 \\ \hline
 & Precomputation & Execution & & \\ \hline
 Total Time & 117 & 60.7 & 71 & 125 \\ \hline
 \end{tabular}\\\\
+
+\newpage
 
 \subsection{Test 10: inputTest7Hard.txt}
 
