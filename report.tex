@@ -58,6 +58,7 @@ A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{
 \end{algorithm}
 
 In order to present the ILP model, we define the necessary parameters and variables:
+
 \begin{table}[H]
 \small
 \begin{tabular}{c l}
@@ -77,7 +78,9 @@ $\rho_{re}$ & 1 if transference $r$ uses link $e$, 0 otherwise.\\
 $\beta_{raa'}$ & 1 if pair of areas $a \in A_{0}$ and $a' \in A_{1}$ for transference $r$ is feasible.\\
 \end{tabular}
 \end{table}
+
 Variables:
+
 \begin{table}[H]
 \small
 \begin{tabular}{c l}
@@ -87,9 +90,13 @@ $x^{0}_{ar}$ & 1 if transfer $r$ is assigned to area $a \in A_{0}$.\\
 $x^{1}_{ar}$ & 1 if transfer $r$ is assigned to area $a \in A_{1}$.\\
 \end{tabular}
 \end{table}
+
 And the ILP model is as follows:\\\\
+
 $minimize \sum_{r\in R} y_{r} $\\\\
+
 subject to:\\\\
+
 $\sum_{a \in A} \sum_{p \in P}$ $x_{ap} = 1$\\\\
 $\sum_{a \in A_{0(r)}}$ $x^{0}_{ar}=1$    $\forall r \in R$\\\\
 $\sum_{a \in A_{1(r)}}$ $x^{1}_{ar}=1$    $\forall r \in R$\\\\
@@ -98,7 +105,7 @@ $x^{0}_{ar} - \omega_{ar} \leq y_{r}$     $\forall$ $r \in R,$ $a \in A_{0(r)}$\
 $\sum_{r \in R} \sum_{a \in A_{0(r)}}$ $\delta_{as} * \gamma_{at} * \rho_{re} * x^{0}_{ar} + \sum_{r \in R} \sum_{a \in A_{1(r)}} \delta_{as} * \gamma_{at} * \rho_{re} * x^{1}_{ar}$\\ 
 $+ \sum_{a \in a} \sum_{p \in P} \delta_{as} * \gamma_{at} * \rho_{pe} * x_{ap} \leq 1$    $\forall$ $e \in E,$ $s \in S,$ $t \in {\{t^{0},...,T\}}$\\
 
-The first constraint guarantees that the transfer request is served with route $p$ and rectangle $a$. Then we select the feasible rectangles for the ongoing transferences with the next three constraints. Afterwards, with the sixth constraint we decide whether a transference needs to be reallocated or not and the last constraint guarantees that there are no links used by more than one constraint for each time interval. \\
+The first constraint guarantees that the transfer request is served with route $p$ and rectangle $a$. Then we select the feasible rectangles for the ongoing transferences with the next three constraints. Afterwards, with the fifth constraint we decide whether a transference needs to be reallocated or not and the last constraint guarantees that there are no links used by more than one constraint for each time interval. \\
 
 We have implemented and tested our ILP model with the ILOG CPLEX studio.
 
