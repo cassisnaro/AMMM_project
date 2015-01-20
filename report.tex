@@ -22,13 +22,14 @@ The rest of our project report is structured as follows. We present the integer 
 
 \section{ILP Model}
 
-In order to simplify the RSSA problem, we limited our project to only one new transfer being requested. We have a network topology represented by a graph $G(L,E)$ with a set of locations ($L$) and set of fiber connections ($E$). We are given a subset ($D$) of the data-centers' locations. We also know the characteristics of the connections, i.e. a set $S$ of available spectrum slices, and the capacity and number of flows of the optical transponders at each location. The set $R$ contains the ongoing transferences. For each transfer we know the origin ($o_{r}$), destination ($d_{r}$), the remaining amount of data ($v_{r}$) to be transferred, the requested completion time ($c_{r}$), the route ($r_{r}$) and slot currently allocated ($s^{0}_{r}$), the scheduled slot allocation ($s^{1}_{r}$) to be performed at time $t^{1}_{r}$, and the scheduled completion time ($t_{r}$). The details of the new transfer request are given in the tuple $\{o_{r}; d_{r}; v_{r}; c_{r}\}$. The output of our model is the route allocated ($r_{r}$), scheduled completion time ($t_{r}$), bitrate of the connection ($s^{0}_{r}$), the new spectrum allocation ($w^{0}_{r}$), scheduled reallocation ($w^{1}_{r}$, $t^{1}_{r}$), and completion time ($t_{r}$) for each transference that is rescheduled. Our objective is to minimize the number of connections to be rescheduled to make room for the incoming request.\\
+In order to simplify the spectrum allocation problem, we limited our project to only one new transfer being requested. We have a network topology represented by a graph $G(L,E)$ with a set of locations ($L$) and set of fiber connections ($E$). We are given a subset ($D$) of the data-centers' locations. We also know the characteristics of the connections, i.e. a set $S$ of available spectrum slices, and the capacity and number of flows of the optical transponders at each location. The set $R$ contains the ongoing transferences. For each transfer we know the origin ($o_{r}$), destination ($d_{r}$), the remaining amount of data ($v_{r}$) to be transferred, the requested completion time ($c_{r}$), the route ($r_{r}$) and slot currently allocated ($s^{0}_{r}$), the scheduled slot allocation ($s^{1}_{r}$) to be performed at time $t^{1}_{r}$, and the scheduled completion time ($t_{r}$). The details of the new transfer request are given in the tuple $\{o_{r}; d_{r}; v_{r}; c_{r}\}$. The output of our model is the route allocated ($r_{r}$), scheduled completion time ($t_{r}$), bitrate of the connection ($s^{0}_{r}$), the new spectrum allocation ($w^{0}_{r}$), scheduled reallocation ($w^{1}_{r}$, $t^{1}_{r}$), and completion time ($t_{r}$) for each transference that is rescheduled. Our objective is to minimize the number of connections to be rescheduled to make room for the incoming request.\\
 
 % to do: do we need pseudo code for precomputing?
-A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{r}$ from time $t_{0}$ to $t^{1}_{r}$ and $s^{1}_{r}$ from time $t^{1}_{r}$ to $t_{r}$, so that the combined area of the two rectangles allows conveying the remaining amount of data $v_{r}$ and $t_{r} \leq  c_{r}$. To decide dimensions, spectrum and time for the ongoing transferences are precomputed. To do this we have written a Java program which precomputes any feasible combination of rectangles $A_{0}$ and $A_{1}$. To obtain these rectangles, we consider discretized time. The sets of rectangles are generated for the ongoing transferences and the requested transfer.\\\\
+A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{r}$ from time $t_{0}$ to $t^{1}_{r}$ and $s^{1}_{r}$ from time $t^{1}_{r}$ to $t_{r}$, such that the combined area of the two rectangles allows conveying the remaining amount of data $v_{r}$ and $t_{r} \leq  c_{r}$. To decide dimensions, spectrum and time necessary for the ongoing transferences are precomputed. To do this we have written a Java program which precomputes any feasible combination of rectangles $A_{0}$ and $A_{1}$. To obtain these rectangles, we consider discretized time. The sets of rectangles are generated for the ongoing transferences and the requested transfer.\\
 
 \begin{algorithm}[H]
 \caption{Generation of rectangles}\label{rectangles_precomputation}
+\footnotesize
 \begin{algorithmic}[1]
 \Procedure{Rectangles\_precomputation}{$transfer, max\_slice$}
 	\State $start\_time\_a0 \gets 0$
@@ -36,11 +37,11 @@ A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{
 	\For{$end\_time\_a0=1 \to transfer.dead\_line$}
 		\For{$slice\_start\_a0=0 \to max\_slice$}
 			\For{$slice\_end\_a0=slice\_star\_a0 \to max\_slice$}
-				\State $tmp\_a0 \gets Rectangle(start\_time\_a0, end\_time\_a0,slice\_start_a0,slice\_end\_a0)$
-				\For{$j=i \to transfer.dead_line$}
+				\State $tmp\_a0 \gets Rectangle(start\_time\_a0, end\_time\_a0,slice\_start\_a0,slice\_end\_a0)$
+				\For{$j=i \to transfer.deadline$}
 					\For{$slice\_start_a1=0 \to slice\_start_a0$}
-						\For{$slice\_end_a1=slice\_end_a0 \to max_slice$}
-							\State $tmp\_a1 \gets Rectangle(start\_time\_a1, end\_time\_a1,slice\_start_a1,slice\_end\_a1)$
+						\For{$slice\_end\_a1=slice\_end\_a0 \to max\_slice$}
+							\State $tmp\_a1 \gets Rectangle(start\_time\_a1, end\_time\_a1,slice\_start\_a1,slice\_end\_a1)$
 							\If{$transfer.rectanglesCompliant(tmp\_a0, tmp\_a1)$}
 								\State $compliant\_rectangles.add(tmp\_a0, tmp\_a1)$
 							\EndIf
@@ -103,7 +104,7 @@ We have implemented and tested our ILP model with the ILOG CPLEX studio.
 
 \subsection{Main Algorithm}
 
-To solve the spectrum allocation problem use the Greedy and GRASP algorithms. Initially we develop a program to precompute all the available paths in the graph between source and destination nodes of the requested transfer using Breadth-first search. Next, we have divided the search for a feasible solution in three main parts: Trivial Case, Half Hard Case and Hard Case, and we analyze in which category the addition of this new transfer falls into.
+To solve the spectrum allocation problem we use the Greedy and GRASP algorithms. Initially we develop a program to precompute all the available paths in the graph between source and destination nodes of the requested transfer using Breadth-first search. Next, we have divided the search for a feasible solution in three main parts: Trivial Case, Half Hard Case and Hard Case, and we analyze in which category the addition of this new transfer falls into.
 
 \subsubsection{Trivial Case}
 
@@ -158,7 +159,7 @@ The half hard case, Figure~\ref{fig:halfhardcase}, implies evaluating the possib
 			\State $transmission.free\_around\_candidate(candidate)$
 		\EndFor
 		\State $candidate.update()$
-		\If $candidate.size \geq required_slices$
+		\If $candidate.size \geq required\_slices$
 			\State $found \gets True$
 			\State $Break$
 		\EndIf
@@ -216,6 +217,8 @@ For our first meta-heuristic, we used the Greedy algorithm that iterates through
 
 For the second meta-heuristic we implemented a GRASP-like algorithm. The precomputed paths mentioned earlier are sorted by length or number of hops to create our set $C$ of candidates. Using an alpha parameter of 0.3 we select only the best subset of smallest found paths, this is, the RCL set. For each of the three types of solutions we iterate ten times over the paths in the RCL: we select one at random and try to solve it according to the current section. We have a book-keep in each of the three sections to maintain a list of visited paths such that we do not select twice the same option. The general algorithm is described as pseudo-code in Algoritm~\ref{grasp}.\\
 
+The shorter the path, the more likely it is that we will need less reschedulings. With repeatedly random selection we have seen improvement in our optimization: all those cases where the first path returned by the BFS was not the best one, are now improved. The problem is that we need more time to sort the data, retry repeatedly, etc.
+
 \begin{algorithm}[H]
 \caption{GRASP-like}\label{grasp}
 \begin{algorithmic}[1]
@@ -267,13 +270,11 @@ For the second meta-heuristic we implemented a GRASP-like algorithm. The precomp
 \end{algorithmic}
 \end{algorithm}
 
-The shortest the path, the more likely it is that we will need less reschedules. With repeatedly random selection we have seen improvement in our optimization: all those cases where the first path returned by the BFS was not the best one, are now improved. The problem is that we need more time to sort the data, retry repeatedly, etc.
-
 \subsubsection{Local Search}
 
-The local search of our GRASP algorithm consists of using as an input all the free slices obtained after deciding the reschedules to be done. If we have more slices available than the ones required for the requested transfer, we check if we can safely undo some of the reschedule decided in the construction phase. We then choose the undoing which gives us the minimal of total reschedules needed.\\
+The local search of our GRASP algorithm consists of using as an input all the free slices obtained after deciding the reschedulings to be done. If we have more slices available than the ones required for the requested transfer, we check if we can safely undo some of the reschedule decided in the construction phase. We then choose the undoing which gives us the minimal of total reschedulings needed.\\
 
-The decision process is straightforward. We iterate over the set of available slices, and select a window of consecutive slices. This window has to be as long as the minimal number of slices needed. We then test if some of reschedules consisted in liberating slices which are not in our window. All those reschedules can then be safely undone. Of course we select as the best answer the window which enables us to undo as many reschedules as possible. Below the pseudo-code of this search in Algoritm~\ref{local_search}.\\ 
+The decision process is straightforward. We iterate over the set of available slices, and select a window of consecutive slices. This window has to be as long as the minimal number of slices needed. We then test if some of reschedulings consisted in liberating slices which are not in our window. All those reschedulings can then be safely undone. Of course we select as the best answer the window which enables us to undo as many reschedulings as possible. Below the pseudo-code of this search in Algoritm~\ref{local_search}.\\ 
 
 \begin{algorithm}[H]
 \caption{Local Search}\label{local_search}
@@ -285,7 +286,7 @@ The decision process is straightforward. We iterate over the set of available sl
 		\State $UndoCollection \gets new Set()$
 		\State $undo\_candidate \gets [window\_available[0]..window\_available[i-1]] \cup [window\_available[i+required\_slices]..window\_available[end]]$
 		\State $undoes\_possible\gets 0$
-		\ForAll($transmission \in reschedules_possible$)
+		\ForAll($transmission \in reschedules\_possible$)
 			\If{$transmission.undo\_possible(undo\_candidate)$}
 				\State $undoes\_possible++$
 				\State $UndoCollection.add(transmission.validate\_undo())$
@@ -415,7 +416,7 @@ Result & 1 & 2 & 1 \\ \hline
 Total Time & 205.6 & 61 & 93 \\ \hline
 \end{tabular}\\\\
 
-In this example we provide different seven paths, all of which are hard. Each of the path requires two reschedules to make space for the new transfer, all except one where it is possible to do it with just one reschedule. CPLEX finds this solution but needs a long time. The Greedy solution is fast, but stops as soon as it has a solution, which in this case is not the optimal one. Our GRASP-like implementation, keeps iterating and ends up finding this solution: it takes longer than the Greedy solution, but in this case the solution is as good as the one from CPLEX.
+In this example we provide different seven paths, all of which are hard. Each of the path requires two reschedulings to make space for the new transfer, all except one where it is possible to do it with just one reschedule. CPLEX finds this solution but needs a long time. The Greedy solution is fast, but stops as soon as it has a solution, which in this case is not the optimal one. Our GRASP-like implementation, keeps iterating and ends up finding this solution: it takes longer than the Greedy solution, but in this case the solution is as good as the one from CPLEX.
 
 \subsection{Test 6: inputTestHard.txt}
 
@@ -478,7 +479,7 @@ Total Time & 168.9 & 81 & 107 \\ \hline
 
 \begin{figure}[H]
   \centering
-    \includegraphics[scale=0.7]{inputTest5Hard.png}
+    \includegraphics[scale=0.6]{inputTest5Hard.png}
   \caption{Test 9}
   \label{fig:test9}
 \end{figure}
