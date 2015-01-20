@@ -58,6 +58,7 @@ A rescheduling for any transference $r$ needs two spectrum allocations: $s^{0}_{
 \end{algorithm}
 
 In order to present the ILP model, we define the necessary parameters and variables:
+
 \begin{table}[H]
 \small
 \begin{tabular}{c l}
@@ -77,7 +78,9 @@ $\rho_{re}$ & 1 if transference $r$ uses link $e$, 0 otherwise.\\
 $\beta_{raa'}$ & 1 if pair of areas $a \in A_{0}$ and $a' \in A_{1}$ for transference $r$ is feasible.\\
 \end{tabular}
 \end{table}
+
 Variables:
+
 \begin{table}[H]
 \small
 \begin{tabular}{c l}
@@ -87,9 +90,13 @@ $x^{0}_{ar}$ & 1 if transfer $r$ is assigned to area $a \in A_{0}$.\\
 $x^{1}_{ar}$ & 1 if transfer $r$ is assigned to area $a \in A_{1}$.\\
 \end{tabular}
 \end{table}
+
 And the ILP model is as follows:\\\\
+
 $minimize \sum_{r\in R} y_{r} $\\\\
+
 subject to:\\\\
+
 $\sum_{a \in A} \sum_{p \in P}$ $x_{ap} = 1$\\\\
 $\sum_{a \in A_{0(r)}}$ $x^{0}_{ar}=1$    $\forall r \in R$\\\\
 $\sum_{a \in A_{1(r)}}$ $x^{1}_{ar}=1$    $\forall r \in R$\\\\
@@ -98,7 +105,7 @@ $x^{0}_{ar} - \omega_{ar} \leq y_{r}$     $\forall$ $r \in R,$ $a \in A_{0(r)}$\
 $\sum_{r \in R} \sum_{a \in A_{0(r)}}$ $\delta_{as} * \gamma_{at} * \rho_{re} * x^{0}_{ar} + \sum_{r \in R} \sum_{a \in A_{1(r)}} \delta_{as} * \gamma_{at} * \rho_{re} * x^{1}_{ar}$\\ 
 $+ \sum_{a \in a} \sum_{p \in P} \delta_{as} * \gamma_{at} * \rho_{pe} * x_{ap} \leq 1$    $\forall$ $e \in E,$ $s \in S,$ $t \in {\{t^{0},...,T\}}$\\
 
-The first constraint guarantees that the transfer request is served with route $p$ and rectangle $a$. Then we select the feasible rectangles for the ongoing transferences with the next three constraints. Afterwards, with the sixth constraint we decide whether a transference needs to be reallocated or not and the last constraint guarantees that there are no links used by more than one constraint for each time interval. \\
+The first constraint guarantees that the transfer request is served with route $p$ and rectangle $a$. Then we select the feasible rectangles for the ongoing transferences with the next three constraints. Afterwards, with the fifth constraint we decide whether a transference needs to be reallocated or not and the last constraint guarantees that there are no links used by more than one constraint for each time interval. \\
 
 We have implemented and tested our ILP model with the ILOG CPLEX studio.
 
@@ -110,7 +117,7 @@ To solve the spectrum allocation problem we use the Greedy and GRASP algorithms.
 
 \subsubsection{Trivial Case}
 
-A trivial case, showed in Figure~\ref{fig:trivial}, happens when adding a new transfer into the network does not require the rescheduling of any of the other scheduled ongoing transfers, because the required number of free slices is already available throughout all of the slices of the assigned path of the new transfer. In Algorithm~\ref{easy_case} you can see the algorithm explained in pseudo-code.\\
+A trivial case, showed in Figure~\ref{fig:trivial}, happens when adding a new transfer into the network does not require the rescheduling of any of the other scheduled ongoing transfers, because the required number of free slices is already available throughout all of the slices of the assigned path of the new transfer. In Algorithm~\ref{easy_case} you can see the procedure explained in pseudo-code.\\
 
 \begin{figure}[H]
   \centering
@@ -136,7 +143,7 @@ A trivial case, showed in Figure~\ref{fig:trivial}, happens when adding a new tr
 
 \subsubsection{Half Hard Case}
 
-The half hard case, Figure~\ref{fig:halfhardcase}, implies evaluating the possibility of adding a new transfer into the network. In this scenario only some slices are currently available, but not enough. As a consequence, it is necessary to check on each link, of all of the ongoing transferences, and see if they can be rearranged to increase the time it takes to end the transaction, while still maintaining the completion time constraint, consequently freeing up some slices for the requested transfer. We first check if ``squeezing'' the left transfer to the left we have enough space, if not we try ``squeezing'' the right transfer to the right and check again if we have freed all the slices needed by the new transfer. Algorithm~\ref{half_hard} refers to pseudo-code of this particular case.\\
+The half hard case, Figure~\ref{fig:halfhardcase}, implies evaluating the possibility of adding a new transfer into the network where only some slices are currently available, but not enough. As a consequence, it is necessary to check on each link, of all of the ongoing transferences, and see if they can be rearranged to increase the time it takes to end the transaction, while still maintaining the completion time constraint, consequently freeing up some slices for the requested transfer. We first check if ``squeezing'' the left transfer to the left leaves enough space, if not we try ``squeezing'' the right transfer to the right and check again if we have freed all the slices needed by the new transfer. Algorithm~\ref{half_hard} refers to pseudo-code of this particular case.\\
 
 \begin{figure}[H]
   \centering
@@ -173,7 +180,7 @@ The half hard case, Figure~\ref{fig:halfhardcase}, implies evaluating the possib
 
 \subsubsection{Hard Case}
 
-When we do not have any free slices available in any link throughout the selected path, we have a hard case, Figure~\ref{fig:hardcase}. In this particular case, we have to perform the same ``squeezing'' procedure specified in the previous case, but first we have to check each intersection point between two ongoing transferences to select a starting point where we can insert the new transfer that needs to be scheduled. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there. More details about this case can be seen in Algorithm~\ref{hard} pseudo-code.\\
+When we do not have any free slices available in any link throughout the selected path, we have a hard case, Figure~\ref{fig:hardcase}. In this particular case, we have to perform the same ``squeezing'' procedure specified in the previous case, but first we have to check each intersection point between two ongoing transferences to select a starting point where we can insert the new transfer that needs to be scheduled. Once we have found an intersection which we can expand enough to make room for the requested transfer, we have to check on the other links if the expansion is also possible there. More details about this case can be seen in Algorithm~\ref{hard} pseudo-code.\\
 
 \begin{figure}[H]
   \centering
