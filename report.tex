@@ -279,9 +279,9 @@ The shorter the path, the more likely it is that we will need less reschedulings
 \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Local Search}
+\subsection{Local Search}
 
-The local search of our GRASP algorithm consists of using as an input all the free slices obtained after deciding the reschedulings to be done. If we have more slices available than the ones required for the requested transfer, we check if we can safely undo some of the reschedule decided in the construction phase. We then choose the undoing which gives us the minimal of total reschedulings needed.\\
+The local search of our metaheuristic algorithms consists of using as an input all the free slices obtained after deciding the reschedulings to be done. If we have more slices available than the ones required for the requested transfer, we check if we can safely undo some of the reschedule decided in the construction phase. We then choose the undoing which gives us the minimal of total reschedulings needed.\\
 
 The decision process is straightforward. We iterate over the set of available slices, and select a window of consecutive slices. This window has to be as long as the minimal number of slices needed. We then test if some of reschedulings consisted in liberating slices which are not in our window. All those reschedulings can then be safely undone. Of course we select as the best answer the window which enables us to undo as many reschedulings as possible. Below the pseudo-code of this search in Algoritm~\ref{local_search}.\\ 
 
