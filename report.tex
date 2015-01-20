@@ -321,7 +321,7 @@ The decision process is straightforward. We iterate over the set of available sl
 \section{Results}
 As we have said, the different solutions need some previous work before starting the resolution: in the case of the ILP it is the precomputation of the rectangles and the paths, in the case of the metaheuristics it is just the BFS. We have decided to include the time needed for the precomputation in each of the results we present in this section since in any case it is an important step in the resolution of the transfer schedule.
 
-\subsection{Test 1: inputTestHardAndHalfHard.txt}
+\subsection{Test 1: Hard And Half-Hard}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{e}.\\
 
@@ -342,7 +342,7 @@ Total Time & 113 & 72.8 & 60 & 110 \\ \hline
 
 In this example we combine two paths, one with a half-hard solution, the other with a hard solution. The optimal solution is found by rescheduling the half-hard path. The main question is if the Greedy version will take advantage of the fact it will not even check the hard path. Effectively, the time needed by Greedy is clearly the lowest in this scenario.
 
-\subsection{Test 2: inputTestHardAndTrivial.txt}
+\subsection{Test 2: Hard And Trivial}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{e}.\\
 
@@ -363,7 +363,7 @@ Total Time & 76 & 35.7 & 71 & 88 \\ \hline
 
 In this test the obvious solution is to choose the path without any transmissions: all implementations choose this solution. Greedy and GRASP detect this solution right at the beginning, shortening the execution.
 
-\subsection{Test 3: inputTestCombinationIntersectionsSegments.txt}
+\subsection{Test 3: Combination Intersections Segments}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{e}.\\
 
@@ -384,7 +384,7 @@ Total Time & 80 & 211 & 58 & 98 \\ \hline
 
 In this test we have just one path, with many transmissions, defined in such a way that they form a hard solution. We compare how long will the meta-heuristics take to deal with this more complex problem, with the time needed by CPLEX. The result is a clear win for the meta-heuristics: even without taking into account the pre-computation needed before executing CPLEX, the meta-heuristics are faster. It is clear that the Java-code can deal better with the greater number of transmissions.
 
-\subsection{Test 4: inputTestHalfHard.txt}
+\subsection{Test 4: Half-Hard}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 
@@ -407,7 +407,7 @@ Let us remember how the rectangles are precomputed for the ILP: we consider all 
 
 In this example, CPLEX does one of this total frequency shift. This is why the result obtained in the ILP is unreachable by the other two methods.
 
-\subsection{Test 5: inputSeeDifferencesGreedyCplex.txt}
+\subsection{Test 5: See Differences Greedy Cplex}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{e}.\\
 
@@ -440,7 +440,7 @@ Total Time & 59 & 146.6 & 61 & 93 \\ \hline
 
 In this example we provide different seven paths, all of which are hard. Each of the path requires two reschedulings to make space for the new transfer, all except one where it is possible to do it with just one reschedule. CPLEX finds this solution but needs a long time. The Greedy solution is fast, but stops as soon as it has a solution, which in this case is not the optimal one. Our GRASP-like implementation, keeps iterating and ends up finding this solution: it takes longer than the Greedy solution, but in this case the solution is as good as the one from CPLEX.
 
-\subsection{Test 6: inputTestHard.txt}
+\subsection{Test 6: Hard 1}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 1.\\
@@ -461,7 +461,7 @@ Total Time & 65 & 22.2 & 42 & 76 \\ \hline
 
 \newpage
 
-\subsection{Test 7: inputTest2Hard.txt}
+\subsection{Test 7: Hard 2}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 2.\\
@@ -480,7 +480,7 @@ Total Time & 65 & 22.2 & 42 & 76 \\ \hline
 Total Time & 62 & 45 & 56 & 104 \\ \hline
 \end{tabular}\\\\
 
-\subsection{Test 8: inputTest3Hard.txt}
+\subsection{Test 8: Hard 3}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 3.\\
@@ -499,7 +499,7 @@ Total Time & 62 & 45 & 56 & 104 \\ \hline
 Total Time & 112 & 56.9 & 81 & 107 \\ \hline
 \end{tabular}\\\\
 
-\subsection{Test 9: inputTest5Hard.txt}
+\subsection{Test 9: Hard 4}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 5.\\
@@ -520,7 +520,7 @@ Total Time & 117 & 60.7 & 71 & 125 \\ \hline
 
 \newpage
 
-\subsection{Test 10: inputTest7Hard.txt}
+\subsection{Test 10: Hard 5}
 
 \textit{Requested Transfer}: from node \textbf{a} to node \textbf{c}.\\
 \textit{Number of hard paths}: 7.\\
